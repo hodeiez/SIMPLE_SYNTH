@@ -37,6 +37,7 @@ func Run(dspConf DspConf) {
 			log.Printf("error filling up the buffer")
 		}
 		transforms.Gain(dspConf.Osc.Buf, 20)
+		//NoteOn(*noteOn, dspConf)
 		f64ToF32Copy(out, dspConf.Osc.Buf.Data)
 
 		// write to the stream
@@ -47,7 +48,15 @@ func Run(dspConf DspConf) {
 	}
 
 }
+func NoteOn(noteOn bool, osc DspConf) {
 
+	if !noteOn {
+
+		transforms.Gain(osc.Osc.Buf, 0)
+	} else {
+		transforms.Gain(osc.Osc.Buf, 100)
+	}
+}
 func f64ToF32Copy(dst []float32, src []float64) {
 	for i := range src {
 		dst[i] = float32(src[i])

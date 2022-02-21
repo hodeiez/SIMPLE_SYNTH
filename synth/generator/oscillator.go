@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-audio/audio"
 	"github.com/go-audio/generator"
+	"hodei.naiz/simplesynth/synth/midi"
 )
 
 type Osc struct {
@@ -38,20 +39,25 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(freq float64, osc *Osc) Osc {
-
+func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
+	//TODO: use array loop when polyphony is on
 	//	var NoteToPitch = make([]float64, 128)
 	a := 440.0
 	//for i := 0; i < 128; i++ {
-	NoteToPitch := (a / 32) * (math.Pow(2, ((freq - 9) / 12)))
+	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
 	//	}
-	/* log.Println(freq) */
-
+	//TODO: fix logic for noteOn noteOff
 	osc.Osc.SetFreq(NoteToPitch)
-
 	osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)
+	if midimsg.On {
+
+		osc.Osc.Amplitude = 100
+	} else if !midimsg.On {
+		osc.Osc.Amplitude = 0
+	}
 	return *osc
 }
+
 func SelectWave(selector int, osc *Osc) Osc {
 	switch selector {
 	case 0:
