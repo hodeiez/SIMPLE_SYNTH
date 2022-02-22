@@ -1,10 +1,12 @@
 package midi
 
 import (
-	"gitlab.com/gomidi/midi"
-	"gitlab.com/gomidi/midi/reader"
+	"log"
 	"strconv"
 	"strings"
+
+	"gitlab.com/gomidi/midi"
+	"gitlab.com/gomidi/midi/reader"
 
 	driver "gitlab.com/gomidi/rtmididrv"
 )
@@ -40,7 +42,7 @@ func RunMidi(midimsg *MidiMsg) { //*reader.Reader {
 		reader.NoLogger(),
 		// write every message to the out port
 		reader.Each(func(pos *reader.Position, msg midi.Message) {
-			//	fmt.Printf("%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
+			log.Printf("%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
 			thekey, errK := strconv.ParseInt(strings.Fields(msg.String())[4], 10, 64)
 			must(errK)
 			midimsg.Key = int(thekey)
@@ -50,6 +52,7 @@ func RunMidi(midimsg *MidiMsg) { //*reader.Reader {
 	)
 
 	r := rd.ListenTo(in)
+	log.Print("midi started listening")
 	for {
 
 		must(r)

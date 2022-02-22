@@ -52,12 +52,20 @@ func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 	if midimsg.On {
 
 		osc.Osc.Amplitude = 100
+
 	} else if !midimsg.On {
+
 		osc.Osc.Amplitude = 0
+
 	}
 	return *osc
 }
 
+/*
+2022/02/22 23:51:09 channel.NoteOn 36
+2022/02/22 23:51:10 channel.NoteOn 38
+2022/02/22 23:51:10 channel.NoteOff 36
+*/
 func SelectWave(selector int, osc *Osc) Osc {
 	switch selector {
 	case 0:

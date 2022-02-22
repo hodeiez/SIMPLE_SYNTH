@@ -3,22 +3,23 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
-	"os"
 
 	"gioui.org/app"
 	"hodei.naiz/simplesynth/gui"
 	"hodei.naiz/simplesynth/synth/dsp"
 	"hodei.naiz/simplesynth/synth/generator"
 	"hodei.naiz/simplesynth/synth/midi"
+	"log"
+	"os"
 )
 
 func main() {
 	fmt.Println("hello synth")
 	//setup**********************************
-	bufferSize := 64
+	bufferSize := 512
 	osc := generator.Oscillator(bufferSize)
 	message := midi.MidiMsg{Key: 0, On: false}
+	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 	//gui****************************************************************
 	go func() {
@@ -56,7 +57,9 @@ func main() {
 	}()
 
 	//evaluate and execute changes
+
 	for {
+
 		generator.ChangeFreq(message, &osc)
 
 	}
