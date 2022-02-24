@@ -1,7 +1,7 @@
 # Simple Synth with go 
 A simple synth made using golang 
 
-**on development**
+**under development**
 <html>
 <body>
 <h1>development status</h1>
@@ -12,8 +12,8 @@ A simple synth made using golang
 <li>A simple gui running where wave type selector is functional</li>
 </ul>
 <h1>About</h1>
-<p>Before running: get dependendencies, and connect a midi controller</p>
-<p>dependencies needed in your OS apart from "go get $whatever":</p>
+<p>Before running: get dependencies, and connect a midi controller</p>
+<p>Dependencies needed in your OS apart from "go get $whatever":</p>
 <ul>
 <li>rtmidi</li>
 <li>portaudio</li>

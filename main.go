@@ -21,11 +21,11 @@ func main() {
 	message := midi.MidiMsg{Key: 0, On: false}
 	count := generator.Triangle
 	controller := gui.Controls{SelectorFunc: &count}
-
+	appended := []midi.MidiMsg{{Key: 0, On: false}}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
-	//gui****************************************************************
 
+	//gui****************************************************************
 	go func() {
 
 		w := app.NewWindow()
@@ -35,7 +35,8 @@ func main() {
 		}
 		os.Exit(0)
 	}()
-	//simple menu thread this will be for gui
+
+	//simple command menu thread
 	scanner := bufio.NewScanner(os.Stdin)
 	go func() {
 		fmt.Println("type q if you want to quit")
@@ -51,7 +52,7 @@ func main() {
 	//thread for midi
 	go func() {
 
-		midi.RunMidi(&message)
+		midi.RunMidi(&message, &appended)
 
 	}()
 	//thread for audio
@@ -64,7 +65,7 @@ func main() {
 	//evaluate and execute changes
 
 	for {
-
+		log.Println(appended)
 		generator.ChangeFreq(message, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 

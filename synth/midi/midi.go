@@ -17,8 +17,8 @@ type MidiMsg struct {
 
 }
 
-func RunMidi(midimsg *MidiMsg) { //*reader.Reader {
-	// you would take a real driver here e.g.
+func RunMidi(midimsg *MidiMsg, appended *[]MidiMsg) { //*reader.Reader {
+
 	drv, err := driver.New()
 	must(err)
 	// make sure to close all open ports at the end
@@ -40,19 +40,24 @@ func RunMidi(midimsg *MidiMsg) { //*reader.Reader {
 
 	rd := reader.New(
 		reader.NoLogger(),
-		// write every message to the out port
+		// format every message
 		reader.Each(func(pos *reader.Position, msg midi.Message) {
-			log.Printf("%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
+
+			//log.Printf("FIRST%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
 			thekey, errK := strconv.ParseInt(strings.Fields(msg.String())[4], 10, 64)
 			must(errK)
 			midimsg.Key = int(thekey)
 			midimsg.On = strings.Contains(strings.Fields(msg.String())[0], "channel.NoteOn")
-
+			*appended = append(*appended, MidiMsg{int(thekey), midimsg.On})
+			if len(*appended) == 10 {
+				*appended = nil
+			}
 		}),
 	)
 
 	r := rd.ListenTo(in)
 	log.Print("midi started listening")
+
 	for {
 
 		must(r)
