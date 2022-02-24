@@ -18,6 +18,31 @@ type Osc struct {
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
 }
+type MyWaveType int64
+
+const (
+	Triangle MyWaveType = iota
+	Saw
+	Square
+	Sine
+	MyWaveTypeSize
+)
+
+func (s MyWaveType) String() string {
+
+	switch s {
+	case Triangle:
+		return "Triangle"
+	case Saw:
+		return "Saw"
+	case Sine:
+		return "Sine"
+	case Square:
+		return "Square"
+	}
+
+	return "-"
+}
 
 func Oscillator(bufferSize int) Osc {
 	// this has to go to a preconf**************
@@ -66,14 +91,15 @@ func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 2022/02/22 23:51:10 channel.NoteOn 38
 2022/02/22 23:51:10 channel.NoteOff 36
 */
-func SelectWave(selector int, osc *Osc) Osc {
+func SelectWave(selector MyWaveType, osc *Osc) Osc {
+	//inRange := (selector % 4 * 4) / 4
 	switch selector {
 	case 0:
 		osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)
 	case 1:
 		osc.Osc.Shape = generator.WaveType(generator.WaveSaw)
 	case 2:
-		osc.Osc.Shape = generator.WaveType(generator.WaveSqr)
+		osc.Osc.Shape = generator.WaveType(generator.WaveSqr) //TODO:need to fix check go-audio
 	case 3:
 		osc.Osc.Shape = generator.WaveType(generator.WaveSine)
 

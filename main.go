@@ -19,12 +19,16 @@ func main() {
 	bufferSize := 512
 	osc := generator.Oscillator(bufferSize)
 	message := midi.MidiMsg{Key: 0, On: false}
+	count := generator.Triangle
+	controller := gui.Controls{SelectorFunc: &count}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 	//gui****************************************************************
+
 	go func() {
+
 		w := app.NewWindow()
-		err := gui.Render(w)
+		err := gui.Render(w, &controller)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -61,6 +65,7 @@ func main() {
 	for {
 
 		generator.ChangeFreq(message, &osc)
+		generator.SelectWave(*controller.SelectorFunc, &osc)
 
 	}
 

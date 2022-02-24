@@ -11,12 +11,15 @@ import (
 	"hodei.naiz/simplesynth/gui/components"
 )
 
-func Render(w *app.Window) error {
+func Render(w *app.Window, controller *Controls) error {
 	//the theme
 	th := material.NewTheme(gofont.Collection())
 	//fields
 	var ops op.Ops
+	//init
 
+	selector := components.CreateSelector(th)
+	//render
 	for {
 
 		e := <-w.Events()
@@ -24,6 +27,9 @@ func Render(w *app.Window) error {
 		case system.DestroyEvent:
 			return e.Err
 		case system.FrameEvent:
+
+			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
+
 			gtx := layout.NewContext(&ops, e)
 
 			layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -32,7 +38,7 @@ func Render(w *app.Window) error {
 
 			})
 			layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return components.Show(th, gtx)
+				return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
 			})
 			e.Frame(gtx.Ops)
 
