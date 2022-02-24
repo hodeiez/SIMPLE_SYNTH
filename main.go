@@ -21,6 +21,7 @@ func main() {
 	message := midi.MidiMsg{Key: 0, On: false}
 	count := generator.Triangle
 	controller := gui.Controls{SelectorFunc: &count}
+
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 	//gui****************************************************************
@@ -56,7 +57,7 @@ func main() {
 	//thread for audio
 	go func() {
 
-		start := dsp.DspConf{BufferSize: bufferSize, Osc: osc}
+		start := dsp.DspConf{BufferSize: bufferSize, Osc: &osc}
 		dsp.Run(start)
 	}()
 

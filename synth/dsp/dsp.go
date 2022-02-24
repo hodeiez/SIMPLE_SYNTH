@@ -3,7 +3,7 @@ package dsp
 import (
 	"log"
 
-	"github.com/go-audio/transforms"
+	/* "github.com/go-audio/transforms" */
 	"github.com/gordonklaus/portaudio"
 	"hodei.naiz/simplesynth/synth/generator"
 )
@@ -11,7 +11,7 @@ import (
 //** for now we run just one oscillator
 type DspConf struct {
 	BufferSize int
-	Osc        generator.Osc
+	Osc        *generator.Osc
 }
 
 func Run(dspConf DspConf) {
@@ -36,7 +36,7 @@ func Run(dspConf DspConf) {
 		if err := dspConf.Osc.Osc.Fill(dspConf.Osc.Buf); err != nil {
 			log.Printf("error filling up the buffer")
 		}
-		transforms.Gain(dspConf.Osc.Buf, 20)
+		//	transforms.Gain(dspConf.Osc.Buf, 20)
 		//NoteOn(*noteOn, dspConf)
 		f64ToF32Copy(out, dspConf.Osc.Buf.Data)
 

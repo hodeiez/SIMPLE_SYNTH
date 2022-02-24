@@ -2,8 +2,6 @@ module hodei.naiz/simplesynth
 
 go 1.17
 
-require github.com/go-audio/transforms v0.0.0-20180121090939-51830ccc35a5
-
 require (
 	gioui.org v0.0.0-20220219111548-bed5902476c4
 	github.com/go-audio/audio v1.0.0

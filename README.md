@@ -5,7 +5,12 @@ A simple synth made using golang
 <html>
 <body>
 <h1>development status</h1>
-<p>At the moment a simple oscillator runs and it can change the frequency by midi notes</p>
+<p>At the moment: </p>
+<ul>
+<li>a simple oscillator runs and it can change the frequency by midi notes</li>
+<li>four wave type can be selected (square wave needs to be fixed)</li>
+<li>A simple gui running where wave type selector is functional</li>
+</ul>
 <h1>About</h1>
 <p>Before running: get dependendencies, and connect a midi controller</p>
 <p>dependencies needed in your OS apart from "go get $whatever":</p>
