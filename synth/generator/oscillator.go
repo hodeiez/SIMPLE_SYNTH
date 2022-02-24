@@ -72,13 +72,13 @@ func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
 	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg[len(midimsg)-1].Key) - 9) / 12)))
 	//	}
 	//TODO: fix logic for noteOn noteOff!!!!!!!!!!!!!!!!!!!!!
-
-	//osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)
 	//ON OFF
 	if midimsg[len(midimsg)-1].On {
 
 		osc.Osc.Amplitude = 100
+
 		osc.Osc.SetFreq(NoteToPitch)
+
 	} else if !midimsg[len(midimsg)-1].On {
 		if midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key {
 			osc.Osc.Amplitude = 100
@@ -93,12 +93,6 @@ func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
 	return *osc
 }
 
-/*
-if new.Off && new.key != last.key -> run
-2022/02/22 23:51:09 channel.NoteOn 36
-2022/02/22 23:51:10 channel.NoteOn 38
-2022/02/22 23:51:10 channel.NoteOff 36
-*/
 func SelectWave(selector MyWaveType, osc *Osc) Osc {
 
 	switch selector {

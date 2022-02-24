@@ -17,6 +17,7 @@ type DspConf struct {
 func Run(dspConf DspConf) {
 
 	portaudio.Initialize()
+
 	defer portaudio.Terminate()
 	out := make([]float32, dspConf.BufferSize)
 	stream, err := portaudio.OpenDefaultStream(0, 1, 44100, len(out), &out)

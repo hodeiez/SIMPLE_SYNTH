@@ -17,9 +17,10 @@ type MidiMsg struct {
 
 }
 
-func RunMidi(midimsg *MidiMsg, appended *[]MidiMsg) { //*reader.Reader {
+func RunMidi(midiMessages *[]MidiMsg) { //*reader.Reader {
 
 	drv, err := driver.New()
+
 	must(err)
 	// make sure to close all open ports at the end
 	defer drv.Close()
@@ -46,12 +47,12 @@ func RunMidi(midimsg *MidiMsg, appended *[]MidiMsg) { //*reader.Reader {
 			//log.Printf("FIRST%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
 			thekey, errK := strconv.ParseInt(strings.Fields(msg.String())[4], 10, 64)
 			must(errK)
-			midimsg.Key = int(thekey)
-			midimsg.On = strings.Contains(strings.Fields(msg.String())[0], "channel.NoteOn")
-			*appended = append(*appended, MidiMsg{int(thekey), midimsg.On})
-			if len(*appended) == 10 {
-				lastOne := (*appended)[len(*appended)-2]
-				*appended = []MidiMsg{lastOne, {int(thekey), midimsg.On}}
+			//midimsg.Key = int(thekey)
+			isOn := strings.Contains(strings.Fields(msg.String())[0], "channel.NoteOn")
+			*midiMessages = append(*midiMessages, MidiMsg{int(thekey), isOn})
+			if len(*midiMessages) == 10 {
+				lastOne := (*midiMessages)[len(*midiMessages)-2]
+				*midiMessages = []MidiMsg{lastOne, {int(thekey), isOn}}
 			}
 		}),
 	)

@@ -16,12 +16,12 @@ import (
 func main() {
 	fmt.Println("hello synth")
 	//setup**********************************
-	bufferSize := 512
+	bufferSize := 128
 	osc := generator.Oscillator(bufferSize)
-	message := midi.MidiMsg{Key: 0, On: false}
+
 	count := generator.Triangle
 	controller := gui.Controls{SelectorFunc: &count}
-	appended := []midi.MidiMsg{{Key: 0, On: false}, {Key: 0, On: false}}
+	midiMessages := []midi.MidiMsg{{Key: 0, On: false}, {Key: 0, On: false}}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 
@@ -52,7 +52,7 @@ func main() {
 	//thread for midi
 	go func() {
 
-		midi.RunMidi(&message, &appended)
+		midi.RunMidi(&midiMessages)
 
 	}()
 	//thread for audio
@@ -65,8 +65,8 @@ func main() {
 	//evaluate and execute changes
 
 	for {
-		log.Println(appended)
-		generator.ChangeFreq(appended, &osc)
+		//log.Println(midiMessages)
+		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
 	}
