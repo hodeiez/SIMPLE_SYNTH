@@ -50,7 +50,8 @@ func RunMidi(midimsg *MidiMsg, appended *[]MidiMsg) { //*reader.Reader {
 			midimsg.On = strings.Contains(strings.Fields(msg.String())[0], "channel.NoteOn")
 			*appended = append(*appended, MidiMsg{int(thekey), midimsg.On})
 			if len(*appended) == 10 {
-				*appended = nil
+				lastOne := (*appended)[len(*appended)-2]
+				*appended = []MidiMsg{lastOne, {int(thekey), midimsg.On}}
 			}
 		}),
 	)

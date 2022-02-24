@@ -64,35 +64,43 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
+func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
 	//TODO: use array loop when polyphony is on
 	//	var NoteToPitch = make([]float64, 128)
 	a := 440.0
 	//for i := 0; i < 128; i++ {
-	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
+	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg[len(midimsg)-1].Key) - 9) / 12)))
 	//	}
-	//TODO: fix logic for noteOn noteOff
-	osc.Osc.SetFreq(NoteToPitch)
-	osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)
-	if midimsg.On {
+	//TODO: fix logic for noteOn noteOff!!!!!!!!!!!!!!!!!!!!!
+
+	//osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)
+	//ON OFF
+	if midimsg[len(midimsg)-1].On {
 
 		osc.Osc.Amplitude = 100
-
-	} else if !midimsg.On {
-
-		osc.Osc.Amplitude = 0
+		osc.Osc.SetFreq(NoteToPitch)
+	} else if !midimsg[len(midimsg)-1].On {
+		if midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key {
+			osc.Osc.Amplitude = 100
+		} else if !midimsg[len(midimsg)-2].On {
+			osc.Osc.Amplitude = 0
+		} else {
+			osc.Osc.Amplitude = 0
+		}
 
 	}
+
 	return *osc
 }
 
 /*
+if new.Off && new.key != last.key -> run
 2022/02/22 23:51:09 channel.NoteOn 36
 2022/02/22 23:51:10 channel.NoteOn 38
 2022/02/22 23:51:10 channel.NoteOff 36
 */
 func SelectWave(selector MyWaveType, osc *Osc) Osc {
-	//inRange := (selector % 4 * 4) / 4
+
 	switch selector {
 	case 0:
 		osc.Osc.Shape = generator.WaveType(generator.WaveTriangle)

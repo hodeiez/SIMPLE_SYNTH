@@ -21,7 +21,7 @@ func main() {
 	message := midi.MidiMsg{Key: 0, On: false}
 	count := generator.Triangle
 	controller := gui.Controls{SelectorFunc: &count}
-	appended := []midi.MidiMsg{{Key: 0, On: false}}
+	appended := []midi.MidiMsg{{Key: 0, On: false}, {Key: 0, On: false}}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 
@@ -66,7 +66,7 @@ func main() {
 
 	for {
 		log.Println(appended)
-		generator.ChangeFreq(message, &osc)
+		generator.ChangeFreq(appended, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
 	}
