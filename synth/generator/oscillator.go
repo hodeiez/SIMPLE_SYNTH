@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-audio/audio"
 	"github.com/go-audio/generator"
+
 	"hodei.naiz/simplesynth/synth/midi"
 )
 
@@ -64,32 +65,17 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
+func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsr ADSR) Osc {
 	//TODO: use array loop when polyphony is on
 	//	var NoteToPitch = make([]float64, 128)
 	a := 440.0
 	//for i := 0; i < 128; i++ {
 	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg[len(midimsg)-1].Key) - 9) / 12)))
 	//	}
-	//TODO: fix logic for noteOn noteOff!!!!!!!!!!!!!!!!!!!!!
-	//ON OFF
+
 	if midimsg[len(midimsg)-1].On {
-
-		osc.Osc.Amplitude = 100
-
 		osc.Osc.SetFreq(NoteToPitch)
-
-	} else if !midimsg[len(midimsg)-1].On {
-		if midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key {
-			osc.Osc.Amplitude = 100
-		} else if !midimsg[len(midimsg)-2].On {
-			osc.Osc.Amplitude = 0
-		} else {
-			osc.Osc.Amplitude = 0
-		}
-
 	}
-
 	return *osc
 }
 

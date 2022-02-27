@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"fmt"
 
+	"log"
+	"os"
+
 	"gioui.org/app"
 	"hodei.naiz/simplesynth/gui"
 	"hodei.naiz/simplesynth/synth/dsp"
 	"hodei.naiz/simplesynth/synth/generator"
 	"hodei.naiz/simplesynth/synth/midi"
-	"log"
-	"os"
 )
 
 func main() {
@@ -63,10 +64,12 @@ func main() {
 	}()
 
 	//evaluate and execute changes
-
+	pos := 0.0
+	adsr := generator.ADSR{100.0, 10000.0, 1000.00, 1000.00}
 	for {
 		//log.Println(midiMessages)
-		generator.ChangeFreq(midiMessages, &osc)
+		adsr.ADSR(midiMessages, &osc, &pos)
+		generator.ChangeFreq(midiMessages, &osc, &pos, adsr)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
 	}
