@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"gioui.org/app"
+	"gioui.org/unit"
 	"hodei.naiz/simplesynth/gui"
 	"hodei.naiz/simplesynth/synth/dsp"
 	"hodei.naiz/simplesynth/synth/generator"
@@ -22,14 +23,15 @@ func main() {
 
 	count := generator.Triangle
 	controller := gui.Controls{SelectorFunc: &count}
-	midiMessages := []midi.MidiMsg{{Key: 0, On: false}, {Key: 0, On: false}}
+	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
 
 	//gui****************************************************************
 	go func() {
 
-		w := app.NewWindow()
+		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)))
+
 		err := gui.Render(w, &controller)
 		if err != nil {
 			log.Fatal(err)
@@ -65,7 +67,8 @@ func main() {
 
 	//evaluate and execute changes
 	pos := 0.0
-	adsr := generator.ADSR{100.0, 10000.0, 1000.00, 1000.00}
+	//	controlAmp := 0.0
+	adsr := generator.ADSR{AttackTime: 10000.0, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 100000.00, ControlAmp: 0.0}
 	for {
 		//log.Println(midiMessages)
 		adsr.ADSR(midiMessages, &osc, &pos)

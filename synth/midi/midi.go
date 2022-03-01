@@ -17,7 +17,15 @@ type MidiMsg struct {
 
 }
 
-func RunMidi(midiMessages *[]MidiMsg) { //*reader.Reader {
+func IsOn(midimsg []MidiMsg) bool {
+	if midimsg[len(midimsg)-1].On || !midimsg[len(midimsg)-1].On && midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key && midimsg[len(midimsg)-2].On {
+		return true
+	} else if !midimsg[len(midimsg)-1].On && midimsg[len(midimsg)-1].Key == midimsg[len(midimsg)-2].Key || !midimsg[len(midimsg)-1].On && !midimsg[len(midimsg)-2].On {
+		return false
+	}
+	return false
+}
+func RunMidi(midiMessages *[]MidiMsg) {
 
 	drv, err := driver.New()
 
