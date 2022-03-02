@@ -27,6 +27,8 @@ func Render(w *app.Window, controller *Controls) error {
 	//init
 
 	selector := components.CreateSelector(th)
+	sliders := []components.MySlider{components.Slider(th, 0, 10, "A"), components.Slider(th, 0, 10, "D"), components.Slider(th, 0, 10, "S"), components.Slider(th, 0, 10, "R")}
+	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 	//render
 	for {
 
@@ -41,7 +43,7 @@ func Render(w *app.Window, controller *Controls) error {
 			gtx := layout.NewContext(&ops, e)
 
 			layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween}.Layout(gtx,
+				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 
 						return material.Label(th, unit.Dp(50), "Amp+AM+FM").Layout(gtx)
@@ -50,8 +52,8 @@ func Render(w *app.Window, controller *Controls) error {
 						return material.Label(th, unit.Dp(20), "hello Synth!").Layout(gtx)
 					}),
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-
-						return material.Label(th, unit.Dp(50), "ADSR here").Layout(gtx)
+						return components.ShowADSRPanel(th, gtx, adsrPanel)
+						/* return material.Label(th, unit.Dp(50), "ADSR here").Layout(gtx) */
 					}),
 				)
 

@@ -68,7 +68,7 @@ func main() {
 	//evaluate and execute changes
 	pos := 0.0
 	//	controlAmp := 0.0
-	adsr := generator.ADSR{AttackTime: 10000.0, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 100000.00, ControlAmp: 0.0}
+	adsr := generator.ADSR{AttackTime: 10000.0, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
 	for {
 		//log.Println(midiMessages)
 		adsr.ADSR(midiMessages, &osc, &pos)

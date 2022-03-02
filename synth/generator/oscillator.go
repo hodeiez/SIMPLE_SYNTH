@@ -19,6 +19,11 @@ type Osc struct {
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
 }
+
+func (osc *Osc) setAmplitude(amp *float64) {
+	osc.Osc.Amplitude = *amp
+}
+
 type MyWaveType int64
 
 const (

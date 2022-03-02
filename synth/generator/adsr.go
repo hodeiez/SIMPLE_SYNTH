@@ -21,33 +21,31 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64) {
 	d := adsr.DecayTime
 
 	r := adsr.ReleaseTime
-	//TODO: check logic to restart ADSR when two notes On, check the values conversion
+
 	if midi.IsOn(midimsg) {
 
-		if *pos < a {
-			log.Println("ATTACK", osc.Osc.Amplitude, adsr.ControlAmp)
-			val := 1 / a
-			adsr.ControlAmp = osc.Osc.Amplitude
-			osc.Osc.Amplitude += val
-		} else if *pos > a && *pos < a+d {
-			log.Println("DECAY", osc.Osc.Amplitude)
+		if *pos < a && osc.Osc.Amplitude < 1 { //ATTACK
+			log.Println("Attack")
+
+			osc.Osc.Amplitude += 1 / a
+		} else if *pos > a && *pos < a+d { //DECAY
+			log.Println("Decay")
 			if osc.Osc.Amplitude >= adsr.SustainAmp {
 				osc.Osc.Amplitude -= (1 / d)
-				adsr.ControlAmp = osc.Osc.Amplitude
-			} else {
-				*pos = a + d
+
 			}
-		} else if *pos >= a+d {
-			log.Println("SUSTAIN", osc.Osc.Amplitude)
+		} else if *pos >= a+d { //SUSTAIN
+			log.Println("Sustain")
 			osc.Osc.Amplitude = adsr.SustainAmp
-			adsr.ControlAmp = osc.Osc.Amplitude
+
 		}
+		adsr.ControlAmp = osc.Osc.Amplitude
 		*pos++
 	} else if !midi.IsOn(midimsg) {
 		*pos = 0.0
-		log.Println("RELEASE", osc.Osc.Amplitude)
-		if osc.Osc.Amplitude > 0.0 {
-			osc.Osc.Amplitude -= (1 / r)
+		log.Println("RELEASE")
+		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
+			osc.Osc.Amplitude -= (adsr.ControlAmp / r)
 		} else {
 			osc.Osc.Amplitude = 0
 
