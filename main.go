@@ -76,10 +76,10 @@ func main() {
 
 	for {
 
-		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
+		running := adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
-
+		log.Println(running)
 	}
 
 }

@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"log"
-
 	"hodei.naiz/simplesynth/synth/midi"
 )
 
@@ -14,7 +12,7 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64) {
+func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64) string {
 
 	//	a := adsr.AttackTime
 
@@ -25,17 +23,17 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 	if midi.IsOn(midimsg) {
 
 		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
-			log.Println("Attack")
-
+			/* log.Println("Attack")
+			 */
 			osc.Osc.Amplitude += 1 / *a
 		} else if *pos > *a && *pos < *a+d { //DECAY
-			log.Println("Decay")
+			/* log.Println("Decay") */
 			if osc.Osc.Amplitude >= adsr.SustainAmp {
 				osc.Osc.Amplitude -= (1 / d)
 
 			}
 		} else if *pos >= *a+d { //SUSTAIN
-			log.Println("Sustain")
+			/* 	log.Println("Sustain") */
 			osc.Osc.Amplitude = adsr.SustainAmp
 
 		}
@@ -44,7 +42,7 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 	} else if !midi.IsOn(midimsg) {
 		*pos = 0.0
 
-		log.Println("RELEASE")
+		/* log.Println("RELEASE") */
 		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
 			osc.Osc.Amplitude -= (adsr.ControlAmp / r)
 		} else {
@@ -53,5 +51,5 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 		}
 
 	}
-
+	return "running"
 }
