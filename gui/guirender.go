@@ -8,6 +8,7 @@ import (
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
+
 	"gioui.org/unit"
 	"gioui.org/widget/material"
 	"hodei.naiz/simplesynth/gui/components"
@@ -16,11 +17,6 @@ import (
 func Render(w *app.Window, controller *Controls) error {
 	//the theme
 	th := material.NewTheme(gofont.Collection())
-	//th.Palette = material.Palette{Bg: color.NRGBA{250, 50, 50, 255}}
-	th.Bg = color.NRGBA{100, 100, 100, 255}
-	th.ContrastBg = color.NRGBA{0, 0, 100, 255}
-	th.ContrastFg = color.NRGBA{160, 100, 100, 255}
-	th.Fg = color.NRGBA{100, 100, 100, 255}
 
 	//fields
 	var ops op.Ops
@@ -29,6 +25,11 @@ func Render(w *app.Window, controller *Controls) error {
 	selector := components.CreateSelector(th)
 	sliders := []components.MySlider{components.Slider(th, 0, 10, "A"), components.Slider(th, 0, 10, "D"), components.Slider(th, 0, 10, "S"), components.Slider(th, 0, 10, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
+	marginCenter := layout.Inset{Top: unit.Dp(100),
+		Bottom: unit.Dp(50),
+		Right:  unit.Dp(0),
+		Left:   unit.Dp(0)}
+
 	//render
 	for {
 
@@ -41,19 +42,29 @@ func Render(w *app.Window, controller *Controls) error {
 			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
 
 			gtx := layout.NewContext(&ops, e)
+			layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return marginCenter.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
+						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 
-			layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
+							return material.Body2(th, "more ").Layout(gtx)
+						}),
+						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+							return components.ShowADSRPanel(th, gtx, adsrPanel)
+
+						}),
+					)
+
+				})
+			})
+			layout.SW.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 
-						return material.Label(th, unit.Dp(50), "Amp+AM+FM").Layout(gtx)
+						return material.Label(th, unit.Dp(20), "THE SIMPLE SYNTH").Layout(gtx)
 					}),
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return material.Label(th, unit.Dp(20), "hello Synth!").Layout(gtx)
-					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return components.ShowADSRPanel(th, gtx, adsrPanel)
-						/* return material.Label(th, unit.Dp(50), "ADSR here").Layout(gtx) */
+						return material.Label(th, unit.Dp(10), "by hodei").Layout(gtx)
 					}),
 				)
 

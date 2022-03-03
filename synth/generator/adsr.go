@@ -43,6 +43,7 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64) {
 		*pos++
 	} else if !midi.IsOn(midimsg) {
 		*pos = 0.0
+
 		log.Println("RELEASE")
 		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
 			osc.Osc.Amplitude -= (adsr.ControlAmp / r)

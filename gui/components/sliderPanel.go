@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"gioui.org/layout"
-	/* "gioui.org/unit" */
+
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"hodei.naiz/simplesynth/synth/generator"
@@ -46,18 +46,65 @@ func SlidersAction(btnUp *widget.Clickable, btnDown *widget.Clickable, count *ge
 	}
 
 }
+
 func ShowADSRPanel(th *material.Theme, gtx layout.Context, panel SliderPanel) layout.Dimensions {
 
-	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+	return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
 					return panel.Sliders[0].StyledSlide.Layout(gtx)
 
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+
+					return panel.Sliders[0].StyledLabel.Layout(gtx)
+
 				}))
 		}),
-		layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
+					return panel.Sliders[1].StyledSlide.Layout(gtx)
+
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+
+					return panel.Sliders[1].StyledLabel.Layout(gtx)
+
+				}))
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
+					return panel.Sliders[2].StyledSlide.Layout(gtx)
+
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+
+					return panel.Sliders[2].StyledLabel.Layout(gtx)
+
+				}))
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
+					return panel.Sliders[3].StyledSlide.Layout(gtx)
+
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+
+					return panel.Sliders[3].StyledLabel.Layout(gtx)
+
+				}))
+		}),
+
+		/* layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
+			return panel.Sliders[0].StyledSlide.Layout(gtx)
+
+		}), */
+		/* layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
 			return panel.Sliders[1].StyledSlide.Layout(gtx)
 
 		}),
@@ -68,6 +115,6 @@ func ShowADSRPanel(th *material.Theme, gtx layout.Context, panel SliderPanel) la
 		layout.Flexed(20, func(gtx layout.Context) layout.Dimensions {
 			return panel.Sliders[3].StyledSlide.Layout(gtx)
 
-		}),
+		}), */
 	)
 }
