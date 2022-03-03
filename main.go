@@ -22,7 +22,8 @@ func main() {
 	osc := generator.Oscillator(bufferSize)
 
 	count := generator.Triangle
-	controller := gui.Controls{SelectorFunc: &count}
+	attackCtrl := 1000.00
+	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl}
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//TODO: fix latency midi message->osc
 	//************************************************************************************************
@@ -67,11 +68,14 @@ func main() {
 
 	//evaluate and execute changes
 	pos := 0.0
-	//	controlAmp := 0.0
-	adsr := generator.ADSR{AttackTime: 10000.0, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
+
+	/*test attack controller
+	 */
+
+	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
 	for {
-		//log.Println(midiMessages)
-		adsr.ADSR(midiMessages, &osc, &pos)
+
+		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
 		generator.ChangeFreq(midiMessages, &osc, &pos, adsr)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 

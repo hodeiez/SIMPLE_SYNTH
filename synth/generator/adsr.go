@@ -14,9 +14,9 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64) {
+func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64) {
 
-	a := adsr.AttackTime
+	//	a := adsr.AttackTime
 
 	d := adsr.DecayTime
 
@@ -24,17 +24,17 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64) {
 
 	if midi.IsOn(midimsg) {
 
-		if *pos < a && osc.Osc.Amplitude < 1 { //ATTACK
+		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
 			log.Println("Attack")
 
-			osc.Osc.Amplitude += 1 / a
-		} else if *pos > a && *pos < a+d { //DECAY
+			osc.Osc.Amplitude += 1 / *a
+		} else if *pos > *a && *pos < *a+d { //DECAY
 			log.Println("Decay")
 			if osc.Osc.Amplitude >= adsr.SustainAmp {
 				osc.Osc.Amplitude -= (1 / d)
 
 			}
-		} else if *pos >= a+d { //SUSTAIN
+		} else if *pos >= *a+d { //SUSTAIN
 			log.Println("Sustain")
 			osc.Osc.Amplitude = adsr.SustainAmp
 
