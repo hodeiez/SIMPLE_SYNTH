@@ -70,7 +70,7 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsr ADSR) Osc {
+func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
 	//TODO: use array loop when polyphony is on
 	//	var NoteToPitch = make([]float64, 128)
 	a := 440.0

@@ -17,18 +17,24 @@ import (
 
 func main() {
 	fmt.Println("hello synth")
-	//setup**********************************
+	//**********************************************setup**********************************
 	bufferSize := 128
 	osc := generator.Oscillator(bufferSize)
-
+	//--------------------controllers------------------
 	count := generator.Triangle
 	attackCtrl := 1000.00
 	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl}
+	//--------------------------------------------
+	//---------------------------midi notes------------------------------
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
-	//TODO: fix latency midi message->osc
+	//--------------------------------------------------------------------------------
+	//------------------------------ADSR-----------------------------------------------
+	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
+	pos := 0.0
+	//----------------------------------------------------------------------------------
 	//************************************************************************************************
 
-	//gui****************************************************************
+	//**********************************************gui****************************************************************
 	go func() {
 
 		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)))
@@ -67,16 +73,11 @@ func main() {
 	}()
 
 	//evaluate and execute changes
-	pos := 0.0
 
-	/*test attack controller
-	 */
-
-	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
 	for {
 
 		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
-		generator.ChangeFreq(midiMessages, &osc, &pos, adsr)
+		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
 	}

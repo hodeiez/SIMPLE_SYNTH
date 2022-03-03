@@ -43,13 +43,14 @@ func Render(w *app.Window, controller *Controls) error {
 
 			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
 			slideValue := components.SlidersAction(sliders[0].FloatWidget)
+
 			gtx := layout.NewContext(&ops, e)
 			layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginCenter.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							control := float64(slideValue)
-							controller.AttackTime = &control
+
+							*controller.AttackTime = float64(slideValue)
 							return material.Body2(th, strconv.FormatFloat(float64(slideValue), 'f', 2, 64)).Layout(gtx)
 						}),
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
