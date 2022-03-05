@@ -15,4 +15,5 @@ type Controls struct {
 	SustainAmp   *float64
 	ReleaseTime  *float64
 	ADSRcontrol  *ADSRControl
+	ShowAmp      *float64
 }

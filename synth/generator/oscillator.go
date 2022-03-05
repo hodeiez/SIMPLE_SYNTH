@@ -14,14 +14,10 @@ import (
 )
 
 type Osc struct {
-	amplitude   *float64
+	MyAmplitude *float64
 	gainControl float64
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
-}
-
-func (osc *Osc) setAmplitude(amp *float64) {
-	osc.Osc.Amplitude = *amp
 }
 
 type MyWaveType int64

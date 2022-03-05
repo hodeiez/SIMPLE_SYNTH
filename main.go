@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	/* "bufio" */
 	"fmt"
 
 	"log"
@@ -20,21 +20,24 @@ func main() {
 	//**********************************************setup**********************************
 	bufferSize := 128
 	osc := generator.Oscillator(bufferSize)
+
 	//--------------------controllers------------------
 	count := generator.Triangle
 	attackCtrl := 1000.00
-	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl}
+	amplitudeVal := 0.0
+	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl, ShowAmp: &amplitudeVal}
 	//--------------------------------------------
 	//---------------------------midi notes------------------------------
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
-	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 10000.0, SustainAmp: 0.05, ReleaseTime: 10000.00, ControlAmp: 0.0}
+	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 2000.0, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.0}
 	pos := 0.0
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
 
 	//**********************************************gui****************************************************************
+
 	go func() {
 
 		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)))
@@ -47,7 +50,7 @@ func main() {
 	}()
 
 	//simple command menu thread
-	scanner := bufio.NewScanner(os.Stdin)
+	/* scanner := bufio.NewScanner(os.Stdin)
 	go func() {
 		fmt.Println("type q if you want to quit")
 		for scanner.Scan() {
@@ -57,7 +60,7 @@ func main() {
 			}
 		}
 
-	}()
+	}() */
 
 	//thread for midi
 	go func() {
@@ -75,11 +78,22 @@ func main() {
 	//evaluate and execute changes
 
 	for {
-
-		running := adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
+		//TODO: send all adsr Controls
+		/* running  */
+		/* 	log.Println(osc.Osc.Amplitude) */
+		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
-		log.Println(running)
+
+		/* go run(adsr, midiMessages, osc, pos, controller) */
+		//TODO: avoid log println to run adsr.ADSR
+
 	}
 
+}
+func run(adsr generator.ADSR, midiMessages []midi.MidiMsg, osc generator.Osc, pos float64, controller gui.Controls) {
+	adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
+	generator.ChangeFreq(midiMessages, &osc)
+	generator.SelectWave(*controller.SelectorFunc, &osc)
+	log.Println("a")
 }

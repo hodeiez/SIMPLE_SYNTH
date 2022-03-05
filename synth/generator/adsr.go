@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"time"
+
 	"hodei.naiz/simplesynth/synth/midi"
 )
 
@@ -12,7 +14,7 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64) string {
+func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64) {
 
 	//	a := adsr.AttackTime
 
@@ -25,6 +27,7 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
 			/* log.Println("Attack")
 			 */
+
 			osc.Osc.Amplitude += 1 / *a
 		} else if *pos > *a && *pos < *a+d { //DECAY
 			/* log.Println("Decay") */
@@ -51,5 +54,5 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 		}
 
 	}
-	return "running"
+	time.Sleep(1)
 }
