@@ -88,7 +88,7 @@ func SelectWave(selector MyWaveType, osc *Osc) Osc {
 	case 1:
 		osc.Osc.Shape = generator.WaveType(generator.WaveSaw)
 	case 2:
-		osc.Osc.Shape = generator.WaveType(generator.WaveSqr) //TODO:need to fix check go-audio
+		osc.Osc.Shape = generator.WaveType(generator.WaveSqr)
 	case 3:
 		osc.Osc.Shape = generator.WaveType(generator.WaveSine)
 

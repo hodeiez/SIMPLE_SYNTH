@@ -24,6 +24,7 @@ A simple synth made using golang
 <h2>Future features</h2>
 <ul>
 <li>Polyphony</li>
+<li>Velocity sensitivity</li>
 <li>AM/FM modulation</li>
 <li>Low pass effect</li>
 <li>Delay effect</li>

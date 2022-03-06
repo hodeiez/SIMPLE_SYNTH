@@ -1,9 +1,6 @@
 package main
 
 import (
-	/* "bufio" */
-	"fmt"
-
 	"log"
 	"os"
 
@@ -16,7 +13,7 @@ import (
 )
 
 func main() {
-	fmt.Println("hello synth")
+	//IN GOAUDIO osc.go file comment //fmt.Println(o.CurrentPhaseAngle) in line 117
 	//**********************************************setup**********************************
 	bufferSize := 128
 	osc := generator.Oscillator(bufferSize)
@@ -37,7 +34,7 @@ func main() {
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
-	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.0}
+	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 	pos := 0.0
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
@@ -46,7 +43,7 @@ func main() {
 
 	go func() {
 
-		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)))
+		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
 
 		err := gui.Render(w, &controller)
 		if err != nil {
@@ -71,15 +68,10 @@ func main() {
 	//evaluate and execute changes
 
 	for {
-		//TODO: send all adsr Controls
-		/* running  */
-		/* 	log.Println(osc.Osc.Amplitude) */
+
 		adsr.ADSR(midiMessages, &osc, &pos, controller.ADSRcontrol)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
-
-		/* go run(adsr, midiMessages, osc, pos, controller) */
-		//TODO: avoid log println to run adsr.ADSR
 
 	}
 
