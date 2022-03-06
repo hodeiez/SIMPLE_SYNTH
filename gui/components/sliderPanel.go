@@ -50,6 +50,12 @@ func SlidersAction(slider *widget.Float,
 	return slider.Value
 }
 
+/* func SlidersAction2(slider []*widget.Float,
+) []float32 {
+
+	return slider.Value
+} */
+
 func ShowADSRPanel(th *material.Theme, gtx layout.Context, panel SliderPanel) layout.Dimensions {
 
 	return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,

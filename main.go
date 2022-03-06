@@ -24,14 +24,16 @@ func main() {
 	//--------------------controllers------------------
 	count := generator.Triangle
 	attackCtrl := 1000.00
+	decayCtrl := 2000.00
 	amplitudeVal := 0.0
-	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl, ShowAmp: &amplitudeVal}
+	adsrControl := gui.ADSRControl{DecayTime: &decayCtrl}
+	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 	//--------------------------------------------
 	//---------------------------midi notes------------------------------
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
-	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: 2000.0, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.0}
+	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.0}
 	pos := 0.0
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
@@ -81,7 +83,7 @@ func main() {
 		//TODO: send all adsr Controls
 		/* running  */
 		/* 	log.Println(osc.Osc.Amplitude) */
-		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
+		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime, controller.ADSRcontrol.DecayTime)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
@@ -91,9 +93,10 @@ func main() {
 	}
 
 }
-func run(adsr generator.ADSR, midiMessages []midi.MidiMsg, osc generator.Osc, pos float64, controller gui.Controls) {
+
+/* func run(adsr generator.ADSR, midiMessages []midi.MidiMsg, osc generator.Osc, pos float64, controller gui.Controls) {
 	adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
 	generator.ChangeFreq(midiMessages, &osc)
 	generator.SelectWave(*controller.SelectorFunc, &osc)
-	log.Println("a")
-}
+
+} */
