@@ -14,30 +14,27 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float64, d *float64) {
+func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl) {
 
-	//	a := adsr.AttackTime
-
-	//d := adsr.DecayTime
-
-	r := adsr.ReleaseTime
+	a := adsrCtrl.AttackTime
+	d := adsrCtrl.DecayTime
+	s := adsrCtrl.SustainAmp
+	r := adsrCtrl.ReleaseTime
 
 	if midi.IsOn(midimsg) {
 
 		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
-			/* log.Println("Attack")
-			 */
 
 			osc.Osc.Amplitude += 1 / *a
 		} else if *pos > *a && *pos < *a+*d { //DECAY
-			/* log.Println("Decay") */
+
 			if osc.Osc.Amplitude >= adsr.SustainAmp {
 				osc.Osc.Amplitude -= (1 / *d)
 
 			}
 		} else if *pos >= *a+*d { //SUSTAIN
-			/* 	log.Println("Sustain") */
-			osc.Osc.Amplitude = adsr.SustainAmp
+
+			osc.Osc.Amplitude = *s
 
 		}
 		adsr.ControlAmp = osc.Osc.Amplitude
@@ -45,14 +42,13 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, a *float6
 	} else if !midi.IsOn(midimsg) {
 		*pos = 0.0
 
-		/* log.Println("RELEASE") */
 		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
-			osc.Osc.Amplitude -= (adsr.ControlAmp / r)
+			osc.Osc.Amplitude -= (adsr.ControlAmp / *r)
 		} else {
 			osc.Osc.Amplitude = 0
 
 		}
 
 	}
-	time.Sleep(1)
+	time.Sleep(1 * time.Nanosecond)
 }

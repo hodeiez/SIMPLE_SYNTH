@@ -25,15 +25,19 @@ func main() {
 	count := generator.Triangle
 	attackCtrl := 1000.00
 	decayCtrl := 2000.00
+	susCtrl := 0.08
+	relCtrl := 2000.00
+
 	amplitudeVal := 0.0
-	adsrControl := gui.ADSRControl{DecayTime: &decayCtrl}
-	controller := gui.Controls{SelectorFunc: &count, AttackTime: &attackCtrl, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
+
+	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
+	controller := generator.Controls{SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 	//--------------------------------------------
 	//---------------------------midi notes------------------------------
 	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
-	adsr := generator.ADSR{AttackTime: *controller.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.0}
+	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.0}
 	pos := 0.0
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
@@ -50,19 +54,6 @@ func main() {
 		}
 		os.Exit(0)
 	}()
-
-	//simple command menu thread
-	/* scanner := bufio.NewScanner(os.Stdin)
-	go func() {
-		fmt.Println("type q if you want to quit")
-		for scanner.Scan() {
-			switch scanner.Text() {
-			case "q":
-				os.Exit(0)
-			}
-		}
-
-	}() */
 
 	//thread for midi
 	go func() {
@@ -83,7 +74,7 @@ func main() {
 		//TODO: send all adsr Controls
 		/* running  */
 		/* 	log.Println(osc.Osc.Amplitude) */
-		adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime, controller.ADSRcontrol.DecayTime)
+		adsr.ADSR(midiMessages, &osc, &pos, controller.ADSRcontrol)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
@@ -93,10 +84,3 @@ func main() {
 	}
 
 }
-
-/* func run(adsr generator.ADSR, midiMessages []midi.MidiMsg, osc generator.Osc, pos float64, controller gui.Controls) {
-	adsr.ADSR(midiMessages, &osc, &pos, controller.AttackTime)
-	generator.ChangeFreq(midiMessages, &osc)
-	generator.SelectWave(*controller.SelectorFunc, &osc)
-
-} */

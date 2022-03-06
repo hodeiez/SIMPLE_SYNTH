@@ -10,8 +10,10 @@ A simple synth made using golang
 <li>a simple oscillator runs and it can change the frequency by midi notes</li>
 <li>four wave type can be selected (square wave needs to be fixed)</li>
 <li>A simple gui running where wave type selector is functional</li>
-<li>A fixed ADSR working</li>
+<li>A simple ADSR working controlled via GUI</li>
 </ul>
+<image src="synthPic.png"/>
+<h5>actual project status (a wave selector, and an ADSR envelope)</h5>
 <h1>About</h1>
 <p>Before running: get dependencies, and connect a midi controller</p>
 <p>Dependencies needed in your OS apart from "go get $whatever":</p>
@@ -21,8 +23,9 @@ A simple synth made using golang
 </ul>
 <h2>Future features</h2>
 <ul>
-<li>Wave selector</li>
-<li>ADSR</li>
 <li>Polyphony</li>
+<li>AM/FM modulation</li>
+<li>Low pass effect</li>
+<li>Delay effect</li>
 </ul>
 </body></html>
