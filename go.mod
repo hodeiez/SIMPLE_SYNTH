@@ -5,11 +5,14 @@ go 1.17
 require (
 	gioui.org v0.0.0-20220219111548-bed5902476c4
 	github.com/go-audio/audio v1.0.0
+
 	github.com/go-audio/generator v0.0.0-20191129013639-fe5438877d8c
 	github.com/gordonklaus/portaudio v0.0.0-20200911161147-bb74aa485641
 	gitlab.com/gomidi/midi v1.23.7
 	gitlab.com/gomidi/rtmididrv v0.14.0
 )
+
+replace github.com/go-audio/generator => github.com/hodeiez/generator v1.0.0 //I use my fork
 
 require (
 	gioui.org/cpu v0.0.0-20210817075930-8d6a761490d2 // indirect

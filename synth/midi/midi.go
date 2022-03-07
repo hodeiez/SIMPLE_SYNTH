@@ -27,10 +27,16 @@ func IsOn(midimsg []MidiMsg) bool {
 	return false
 }
 func RunMidi(midiMessages *[]MidiMsg) {
+	defer func() {
+		if error := recover(); error != nil {
+			log.Println("NO MIDI!")
+		}
+	}()
 
 	drv, err := driver.New()
 
 	must(err)
+
 	// make sure to close all open ports at the end
 	defer drv.Close()
 

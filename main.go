@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	//IN GOAUDIO osc.go file comment //fmt.Println(o.CurrentPhaseAngle) in line 117
+
 	//**********************************************setup**********************************
 	bufferSize := 128
 	osc := generator.Oscillator(bufferSize)
