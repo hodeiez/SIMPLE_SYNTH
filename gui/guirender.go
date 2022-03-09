@@ -3,7 +3,6 @@ package gui
 import (
 	"image"
 	"image/color"
-	"strconv"
 
 	"gioui.org/app"
 	"gioui.org/f32"
@@ -56,11 +55,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-
-							return material.Body2(th, strconv.FormatFloat(float64(sliders[0].FloatWidget.Value), 'f', 2, 64)).Layout(gtx)
-						}),
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-
+							adsrImage(&ops, sliders)
 							return components.ShowADSRPanel(th, gtx, adsrPanel)
 
 						}),
@@ -72,10 +67,9 @@ func Render(w *app.Window, controller *generator.Controls) error {
 				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween}.Layout(gtx,
 					layout.Rigid(
 						func(gtx layout.Context) layout.Dimensions {
-							circle := clip.Ellipse{f32.Point{sliders[2].FloatWidget.Value, sliders[3].FloatWidget.Value}, f32.Point{-1 * sliders[0].FloatWidget.Value, sliders[1].FloatWidget.Value}}.Op(gtx.Ops)
-							color := color.NRGBA{R: 255, A: 255, B: 100}
-							paint.FillShape(gtx.Ops, color, circle)
-							d := image.Point{Y: 500}
+
+							d := image.Point{Y: 100, X: 100}
+							//return strokeTriangle(&ops, d, gtx)
 							return layout.Dimensions{Size: d}
 						}),
 				)
@@ -107,18 +101,27 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*controller.SustainAmp = float64(sliders[2].FloatWidget.Value)
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
 }
-func redTriangle(ops *op.Ops) {
+
+//TODO: move to components
+func adsrImage(ops *op.Ops, sliders []components.MySlider) {
 	var path clip.Path
+	attackVal := float32(10) + sliders[0].FloatWidget.Value/20
+	decayVal := attackVal + (sliders[1].FloatWidget.Value / 20)
+	susamp := -20 - (sliders[2].FloatWidget.Value * 100)
+	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20)
+
 	path.Begin(ops)
-	path.Move(f32.Pt(50, 0))
-	path.Quad(f32.Pt(0, 90), f32.Pt(50, 100))
-	path.Line(f32.Pt(-100, 0))
-	path.Line(f32.Pt(50, -100))
-	defer clip.Outline{Path: path.End()}.Op().Push(ops).Pop()
-	drawRedRect(ops)
-}
-func drawRedRect(ops *op.Ops) {
-	defer clip.Rect{Max: image.Pt(100, 100)}.Push(ops).Pop()
-	paint.ColorOp{Color: color.NRGBA{R: 0x80, A: 0xFF}}.Add(ops)
-	paint.PaintOp{}.Add(ops)
+	path.MoveTo(f32.Pt(0, -20))
+	path.LineTo(f32.Pt(attackVal, -80))
+	path.LineTo(f32.Pt(decayVal, susamp))
+	path.LineTo(f32.Pt(attackVal+decayVal, susamp))
+	path.LineTo(f32.Pt(releaseVal, -20))
+
+	color := color.NRGBA{R: 255, A: 255, B: 100}
+	paint.FillShape(ops, color,
+		clip.Stroke{
+			Path:  path.End(),
+			Width: 4,
+		}.Op())
+
 }
