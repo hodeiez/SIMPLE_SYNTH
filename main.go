@@ -67,10 +67,10 @@ func main() {
 	}()
 
 	//evaluate and execute changes
-
+	currentNote := midi.MidiMsg{-1, false}
 	for {
 
-		adsr.ADSR(midiMessages, &osc, &pos, controller.ADSRcontrol)
+		adsr.ADSR(midiMessages, &osc, &pos, controller.ADSRcontrol, &currentNote)
 		generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
 
