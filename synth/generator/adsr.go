@@ -28,7 +28,7 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl 
 			osc.Osc.Amplitude += 1 / *a
 		} else if *pos > *a && *pos < *a+*d { //DECAY
 
-			if osc.Osc.Amplitude >= adsr.SustainAmp {
+			if osc.Osc.Amplitude > adsr.SustainAmp {
 				osc.Osc.Amplitude -= (1 / *d)
 
 			}

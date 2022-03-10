@@ -102,7 +102,7 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
 }
 
-//TODO: move to components
+//TODO: move to components and fix values (add beziers?)
 func adsrImage(ops *op.Ops, sliders []components.MySlider) {
 	var path clip.Path
 	attackVal := float32(10) + sliders[0].FloatWidget.Value/20
@@ -116,12 +116,11 @@ func adsrImage(ops *op.Ops, sliders []components.MySlider) {
 	path.LineTo(f32.Pt(decayVal, susamp))
 	path.LineTo(f32.Pt(attackVal+decayVal, susamp))
 	path.LineTo(f32.Pt(releaseVal, -20))
-
 	color := color.NRGBA{R: 255, A: 255, B: 100}
 	paint.FillShape(ops, color,
 		clip.Stroke{
 			Path:  path.End(),
-			Width: 4,
+			Width: 8,
 		}.Op())
 
 }
