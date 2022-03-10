@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"log"
 	"time"
 
 	"hodei.naiz/simplesynth/synth/midi"
@@ -14,15 +15,15 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl) {
+func (adsr *ADSR) ADSR(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl) {
 
 	a := adsrCtrl.AttackTime
 	d := adsrCtrl.DecayTime
 	s := adsrCtrl.SustainAmp
 	r := adsrCtrl.ReleaseTime
-
-	if midi.IsOn(midimsg) {
-
+	currentNote := midi.MidiMsg{-1, false}
+	if midimsg.On {
+		currentNote = midimsg
 		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
 
 			osc.Osc.Amplitude += 1 / *a
@@ -39,7 +40,8 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl 
 		}
 		adsr.ControlAmp = osc.Osc.Amplitude
 		*pos++
-	} else if !midi.IsOn(midimsg) {
+	} else if !currentNote.On {
+		currentNote = midimsg
 		*pos = 0.0
 
 		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
@@ -50,5 +52,6 @@ func (adsr *ADSR) ADSR(midimsg []midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl 
 		}
 
 	}
+	log.Println(currentNote)
 	time.Sleep(1 * time.Nanosecond)
 }

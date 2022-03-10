@@ -66,15 +66,15 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg []midi.MidiMsg, osc *Osc) Osc {
+func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 	//TODO: use array loop when polyphony is on
 	//	var NoteToPitch = make([]float64, 128)
 	a := 440.0
 	//for i := 0; i < 128; i++ {
-	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg[len(midimsg)-1].Key) - 9) / 12)))
+	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
 	//	}
 
-	if midimsg[len(midimsg)-1].On {
+	if midimsg.On {
 		osc.Osc.SetFreq(NoteToPitch)
 	}
 	return *osc

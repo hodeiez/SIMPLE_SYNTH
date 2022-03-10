@@ -26,7 +26,7 @@ func IsOn(midimsg []MidiMsg) bool {
 	}
 	return false
 }
-func RunMidi(midiMessages *[]MidiMsg) {
+func RunMidi(midimsg *MidiMsg) {
 	defer func() {
 		if error := recover(); error != nil {
 			log.Println("NO MIDI!")
@@ -62,13 +62,15 @@ func RunMidi(midiMessages *[]MidiMsg) {
 			//log.Printf("FIRST%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
 			thekey, errK := strconv.ParseInt(strings.Fields(msg.String())[4], 10, 64)
 			must(errK)
-			//midimsg.Key = int(thekey)
+			midimsg.Key = int(thekey)
 			isOn := strings.Contains(strings.Fields(msg.String())[0], "channel.NoteOn")
-			*midiMessages = append(*midiMessages, MidiMsg{int(thekey), isOn})
+			midimsg.On = isOn
+
+			/* *midiMessages = append(*midiMessages, MidiMsg{int(thekey), isOn})
 			if len(*midiMessages) == 10 {
 				lastOne := (*midiMessages)[len(*midiMessages)-2]
 				*midiMessages = []MidiMsg{lastOne, {int(thekey), isOn}}
-			}
+			} */
 		}),
 	)
 

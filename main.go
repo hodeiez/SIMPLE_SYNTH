@@ -31,7 +31,8 @@ func main() {
 	controller := generator.Controls{SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 	//--------------------------------------------
 	//---------------------------midi notes------------------------------
-	midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
+	//midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
+	midiMessages := midi.MidiMsg{Key: -1, On: false}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
 	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
