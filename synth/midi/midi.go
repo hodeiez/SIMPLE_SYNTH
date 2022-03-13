@@ -17,6 +17,7 @@ type MidiMsg struct {
 
 }
 
+/*old method*/
 func IsOn(midimsg []MidiMsg) bool {
 
 	if midimsg[len(midimsg)-1].On || !midimsg[len(midimsg)-1].On && midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key && midimsg[len(midimsg)-2].On {

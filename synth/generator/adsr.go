@@ -27,6 +27,7 @@ func (adsr *ADSR) ADSR(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *A
 			   noteoff 35 != 36  on
 			   noteOff 36 == 36 off
 		on=current
+		s
 	*/
 
 	if midimsg.On {

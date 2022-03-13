@@ -15,7 +15,7 @@ import (
 func main() {
 
 	//**********************************************setup**********************************
-	bufferSize := 128
+	bufferSize := 64
 	osc := generator.Oscillator(bufferSize)
 
 	//--------------------controllers------------------
@@ -37,8 +37,15 @@ func main() {
 	//------------------------------ADSR-----------------------------------------------
 	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 	pos := 0.0
+	pos2 := 0.0
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
+	/***
+
+	TESTING POLYPHONY*/
+	osc2 := generator.Oscillator(bufferSize)
+	voicesArray := []*generator.Voice{{Oscillator: &osc, Midi: midi.MidiMsg{Key: -1, On: false}}, {Oscillator: &osc2, Midi: midi.MidiMsg{Key: -1, On: false}}}
+	voices := generator.VoiceManager{Voices: voicesArray}
 
 	//**********************************************gui****************************************************************
 
@@ -68,12 +75,16 @@ func main() {
 
 	//evaluate and execute changes
 	currentNote := midi.MidiMsg{-1, false}
+
 	for {
 
 		adsr.ADSR(midiMessages, &osc, &pos, controller.ADSRcontrol, &currentNote)
-		generator.ChangeFreq(midiMessages, &osc)
+		adsr.ADSR(midiMessages, &osc2, &pos2, controller.ADSRcontrol, &currentNote)
+		//generator.ChangeFreq(midiMessages, &osc)
 		generator.SelectWave(*controller.SelectorFunc, &osc)
-
+		generator.SelectWave(*controller.SelectorFunc, &osc2)
+		generator.RunPolly(voices, midiMessages)
+		//generator.VoiceOnNoteOff(voices, midiMessages)
 	}
 
 }
