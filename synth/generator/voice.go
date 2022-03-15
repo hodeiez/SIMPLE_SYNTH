@@ -10,6 +10,7 @@ type Voice struct {
 	Oscillator *Osc
 	//IsOn       bool
 	Midi midi.MidiMsg
+	ADSR *ADSR
 }
 
 type VoiceManager struct {
@@ -49,7 +50,7 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg) {
 
 		} else {
 			vManager.Voices[voiceIndex].Midi = midimsg
-			*vManager.Voices[voiceIndex].Oscillator = ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
 			log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
 
 		}

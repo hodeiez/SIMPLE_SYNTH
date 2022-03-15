@@ -69,7 +69,7 @@ func main() {
 	//thread for audio
 	go func() {
 
-		start := dsp.DspConf{BufferSize: bufferSize, Osc: &osc}
+		start := dsp.DspConf{BufferSize: bufferSize, Osc: &osc, Osc2: &osc2}
 		dsp.Run(start)
 	}()
 

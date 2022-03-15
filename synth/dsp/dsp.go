@@ -3,7 +3,6 @@ package dsp
 import (
 	"log"
 
-	/* "github.com/go-audio/transforms" */
 	"github.com/gordonklaus/portaudio"
 	"hodei.naiz/simplesynth/synth/generator"
 )
@@ -12,6 +11,7 @@ import (
 type DspConf struct {
 	BufferSize int
 	Osc        *generator.Osc
+	Osc2       *generator.Osc
 }
 
 func Run(dspConf DspConf) {
@@ -20,7 +20,9 @@ func Run(dspConf DspConf) {
 
 	defer portaudio.Terminate()
 	out := make([]float32, dspConf.BufferSize)
-	stream, err := portaudio.OpenDefaultStream(0, 1, 44100, len(out), &out)
+	//	out2 := make([]float32, dspConf.BufferSize)
+
+	stream, err := portaudio.OpenDefaultStream(0, 2, 44100, len(out), &out)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,14 +34,23 @@ func Run(dspConf DspConf) {
 	}
 	defer stream.Stop()
 
+	/*we divide amplitude by amount of osc*/
+	dspConf.Osc.Osc.Amplitude /= 2
+	dspConf.Osc2.Osc.Amplitude /= 2
 	for {
 		// populate the out buffer
 		if err := dspConf.Osc.Osc.Fill(dspConf.Osc.Buf); err != nil {
 			log.Printf("error filling up the buffer")
 		}
-		//	transforms.Gain(dspConf.Osc.Buf, 20)
+		if err := dspConf.Osc2.Osc.Fill(dspConf.Osc2.Buf); err != nil {
+			log.Printf("error filling up the buffer")
+		}
+
+		/* 	transforms.Gain(dspConf.Osc.Buf, 20) */
+
 		//NoteOn(*noteOn, dspConf)
-		f64ToF32Copy(out, dspConf.Osc.Buf.Data)
+		f64ToF32Copy(out, dspConf.Osc.Buf.Data, dspConf.Osc2.Buf.Data)
+		//	f64ToF32Copy(out2, dspConf.Osc2.Buf.Data)
 
 		// write to the stream
 		if err := stream.Write(); err != nil {
@@ -50,8 +61,8 @@ func Run(dspConf DspConf) {
 
 }
 
-func f64ToF32Copy(dst []float32, src []float64) {
+func f64ToF32Copy(dst []float32, src []float64, src2 []float64) {
 	for i := range src {
-		dst[i] = float32(src[i])
+		dst[i] = float32(src[i]) + float32(src2[i])
 	}
 }
