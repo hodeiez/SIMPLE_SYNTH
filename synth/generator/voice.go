@@ -21,6 +21,21 @@ type FoundKey struct {
 	Key   int
 }
 
+func setupVoice(bufferSize int) *Voice {
+	osc := Oscillator(bufferSize)
+	Midi := midi.MidiMsg{Key: -1, On: false}
+	return &Voice{Oscillator: &osc, Midi: Midi}
+}
+func PolyInit(bufferSize int, amountOfVoices int) VoiceManager {
+	var voices []*Voice
+	i := 0
+	for i <= amountOfVoices {
+		voices = append(voices, setupVoice(bufferSize))
+
+		i++
+	}
+	return VoiceManager{Voices: voices}
+}
 func (vManager *VoiceManager) FindFreeVoice() int {
 	key := -1
 	for index, voice := range vManager.Voices {
