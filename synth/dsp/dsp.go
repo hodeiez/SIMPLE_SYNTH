@@ -10,10 +10,12 @@ import (
 //** for now we run just one oscillator
 type DspConf struct {
 	BufferSize int
-	Osc        *generator.Osc
-	Osc2       *generator.Osc
+	//Osc        *generator.Osc
+	//Osc2       *generator.Osc
+	Oscs []*generator.Osc
 }
 
+//TODO: review and fix the volume and amplitude
 func Run(dspConf DspConf) {
 
 	portaudio.Initialize()
@@ -33,23 +35,34 @@ func Run(dspConf DspConf) {
 		log.Fatal(err)
 	}
 	defer stream.Stop()
+	todivide := len(dspConf.Oscs)
 
-	/*we divide amplitude by amount of osc*/
-	dspConf.Osc.Osc.Amplitude /= 2
-	dspConf.Osc2.Osc.Amplitude /= 2
+	for _, oscillators := range dspConf.Oscs {
+		oscillators.Osc.Amplitude -= (oscillators.Osc.Amplitude / float64(todivide))
+
+	}
+	/* dspConf.Osc.Osc.Amplitude /= 8
+	dspConf.Osc2.Osc.Amplitude /= 8 */
 	for {
 		// populate the out buffer
-		if err := dspConf.Osc.Osc.Fill(dspConf.Osc.Buf); err != nil {
+		for _, oscillators := range dspConf.Oscs {
+			if err := oscillators.Osc.Fill(oscillators.Buf); err != nil {
+				log.Printf("error filling up the buffer")
+			}
+
+		}
+		/* if err := dspConf.Osc.Osc.Fill(dspConf.Osc.Buf); err != nil {
 			log.Printf("error filling up the buffer")
 		}
 		if err := dspConf.Osc2.Osc.Fill(dspConf.Osc2.Buf); err != nil {
 			log.Printf("error filling up the buffer")
-		}
+		} */
 
 		/* 	transforms.Gain(dspConf.Osc.Buf, 20) */
 
 		//NoteOn(*noteOn, dspConf)
-		f64ToF32Copy(out, dspConf.Osc.Buf.Data, dspConf.Osc2.Buf.Data)
+		f64ToF32Mixing(out, dspConf)
+		//f64ToF32Copy(out, dspConf)
 		//	f64ToF32Copy(out2, dspConf.Osc2.Buf.Data)
 
 		// write to the stream
@@ -61,8 +74,26 @@ func Run(dspConf DspConf) {
 
 }
 
-func f64ToF32Copy(dst []float32, src []float64, src2 []float64) {
+/* func f64ToF32Copy(dst []float32, src []float64, src2 []float64) {
 	for i := range src {
 		dst[i] = float32(src[i]) + float32(src2[i])
 	}
+} */
+/**************
+osc[0][i]+osc[1][i]
+
+*/
+
+func f64ToF32Mixing(dst []float32, src DspConf) {
+
+	for i := range src.Oscs[0].Buf.Data {
+		sum := float32(0.0)
+		for _, el := range src.Oscs {
+			sum += float32(el.Buf.Data[i])
+			dst[i] = sum
+
+		}
+
+	}
+
 }

@@ -7,10 +7,10 @@ import (
 )
 
 type Voice struct {
-	Oscillator *Osc
-	//IsOn       bool
-	Midi midi.MidiMsg
-	ADSR *ADSR
+	Oscillator  *Osc
+	TimeControl *float64
+	Midi        midi.MidiMsg
+	ADSR        *ADSR
 }
 
 type VoiceManager struct {
@@ -24,7 +24,8 @@ type FoundKey struct {
 func setupVoice(bufferSize int) *Voice {
 	osc := Oscillator(bufferSize)
 	Midi := midi.MidiMsg{Key: -1, On: false}
-	return &Voice{Oscillator: &osc, Midi: Midi}
+	timeControl := 0.0
+	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: &timeControl}
 }
 func PolyInit(bufferSize int, amountOfVoices int) VoiceManager {
 	var voices []*Voice

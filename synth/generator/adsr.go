@@ -39,6 +39,7 @@ func (adsr *ADSR) ADSRforPoly(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsr
 		}
 		adsr.ControlAmp = osc.Osc.Amplitude
 		*pos++
+		//this goes to noteOff in voice
 	} else if !midimsg.On {
 
 		*pos = 0.0
@@ -66,9 +67,9 @@ func (adsr *ADSR) ADSR(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *A
 	}
 	if midimsg.On {
 
-		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
+		if *pos < *a && osc.Osc.Amplitude < 0.6 { //ATTACK
 
-			osc.Osc.Amplitude += 1 / *a
+			osc.Osc.Amplitude += 0.6 / *a
 		} else if *pos > *a && *pos < *a+*d { //DECAY
 
 			if osc.Osc.Amplitude > adsr.SustainAmp {

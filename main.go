@@ -35,8 +35,8 @@ func main() {
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
 	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
-	pos := 0.0
-	pos2 := 0.0
+	/* pos := 0.0
+	pos2 := 0.0 */
 	//----------------------------------------------------------------------------------
 	//************************************************************************************************
 	/***
@@ -66,17 +66,17 @@ func main() {
 	//thread for audio
 	go func() {
 
-		start := dsp.DspConf{BufferSize: bufferSize, Osc: vmanager.Voices[0].Oscillator, Osc2: vmanager.Voices[1].Oscillator}
+		start := dsp.DspConf{BufferSize: bufferSize, Oscs: []*generator.Osc{vmanager.Voices[0].Oscillator, vmanager.Voices[1].Oscillator}}
 		dsp.Run(start)
 	}()
 
 	//evaluate and execute changes
 	currentNote := midi.MidiMsg{-1, false}
-
+	//TODO: refactor adsr to voice
 	for {
 
-		adsr.ADSR(midiMessages, vmanager.Voices[0].Oscillator, &pos, controller.ADSRcontrol, &currentNote)
-		adsr.ADSR(midiMessages, vmanager.Voices[1].Oscillator, &pos2, controller.ADSRcontrol, &currentNote)
+		adsr.ADSR(midiMessages, vmanager.Voices[0].Oscillator, vmanager.Voices[0].TimeControl, controller.ADSRcontrol, &currentNote)
+		adsr.ADSR(midiMessages, vmanager.Voices[1].Oscillator, vmanager.Voices[1].TimeControl, controller.ADSRcontrol, &currentNote)
 
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[0].Oscillator)
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[1].Oscillator)
