@@ -21,19 +21,19 @@ type FoundKey struct {
 	Key   int
 }
 
-func setupVoice(bufferSize int, controller Controls) *Voice {
+func setupVoice(bufferSize int) *Voice {
 	osc := Oscillator(bufferSize)
-	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
+	adsr := ADSR{AttackTime: 1000.00, DecayTime: 2000.00, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.01}
 	osc.Osc.Amplitude = 0.01
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
 	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: &timeControl, ADSR: &adsr}
 }
-func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
+func PolyInit(bufferSize int, amountOfVoices int) VoiceManager {
 	var voices []*Voice
 	i := 0
 	for i <= amountOfVoices {
-		voices = append(voices, setupVoice(bufferSize, controller))
+		voices = append(voices, setupVoice(bufferSize))
 
 		i++
 	}
