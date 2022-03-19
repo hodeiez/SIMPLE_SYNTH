@@ -21,17 +21,19 @@ type FoundKey struct {
 	Key   int
 }
 
-func setupVoice(bufferSize int) *Voice {
+func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc := Oscillator(bufferSize)
+	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
+	osc.Osc.Amplitude = 0.01
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
-	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: &timeControl}
+	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: &timeControl, ADSR: &adsr}
 }
-func PolyInit(bufferSize int, amountOfVoices int) VoiceManager {
+func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
 	var voices []*Voice
 	i := 0
 	for i <= amountOfVoices {
-		voices = append(voices, setupVoice(bufferSize))
+		voices = append(voices, setupVoice(bufferSize, controller))
 
 		i++
 	}
@@ -67,7 +69,11 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg) {
 		} else {
 			vManager.Voices[voiceIndex].Midi = midimsg
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
-			log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
+			//value := float64(1000.00)
+			/* if *vManager.Voices[voiceIndex].TimeControl < value {
+				vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude += 0.01
+			} */
+			log.Println("TCONTROL", vManager.Voices[voiceIndex].TimeControl)
 
 		}
 	}
@@ -78,12 +84,34 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg) {
 
 		vManager.Voices[foundKey.Index].Midi.On = false
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-
-		log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
+		/* if *vManager.Voices[foundKey.Index].TimeControl == 0.0 {
+			vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude = 0.0000
+		} */
+		//	log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
 	}
 }
 
-func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg) {
+func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 	VoiceOnNoteOn(vManager, midimsg)
 	VoiceOnNoteOff(vManager, midimsg)
+	//vManager.timeControlCounter()
+	vManager.adsrRun(controller)
+
+	//log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
+}
+
+/*
+func (vManager *VoiceManager) timeControlCounter() {
+	for _, voice := range vManager.Voices {
+		if voice.Midi.On {
+			*voice.TimeControl++
+		} else if !voice.Midi.On {
+			*voice.TimeControl = 0
+		}
+	}
+} */
+func (vManager *VoiceManager) adsrRun(controller Controls) {
+	for _, voice := range vManager.Voices {
+		voice.ADSR.ADSRforPoly(voice.Midi, voice.Oscillator, voice.TimeControl, controller.ADSRcontrol)
+	}
 }

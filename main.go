@@ -34,7 +34,7 @@ func main() {
 	midiMessages := midi.MidiMsg{Key: -1, On: false}
 	//--------------------------------------------------------------------------------
 	//------------------------------ADSR-----------------------------------------------
-	adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
+	//adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 	/* pos := 0.0
 	pos2 := 0.0 */
 	//----------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ func main() {
 	/***
 
 	TESTING POLYPHONY*/
-	vmanager := generator.PolyInit(bufferSize, 2)
+	vmanager := generator.PolyInit(bufferSize, 2, controller)
 
 	//**********************************************gui****************************************************************
 
@@ -71,16 +71,16 @@ func main() {
 	}()
 
 	//evaluate and execute changes
-	currentNote := midi.MidiMsg{-1, false}
+	//	currentNote := midi.MidiMsg{-1, false}
 	//TODO: refactor adsr to voice
 	for {
 
-		adsr.ADSR(midiMessages, vmanager.Voices[0].Oscillator, vmanager.Voices[0].TimeControl, controller.ADSRcontrol, &currentNote)
-		adsr.ADSR(midiMessages, vmanager.Voices[1].Oscillator, vmanager.Voices[1].TimeControl, controller.ADSRcontrol, &currentNote)
-
+		/* 	adsr.ADSR(midiMessages, vmanager.Voices[0].Oscillator, &vmanager.Voices[0].TimeControl, controller.ADSRcontrol, &currentNote)
+		adsr.ADSR(midiMessages, vmanager.Voices[1].Oscillator, &vmanager.Voices[1].TimeControl, controller.ADSRcontrol, &currentNote)
+		*/
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[0].Oscillator)
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[1].Oscillator)
-		generator.RunPolly(vmanager, midiMessages)
+		generator.RunPolly(vmanager, midiMessages, controller)
 
 	}
 

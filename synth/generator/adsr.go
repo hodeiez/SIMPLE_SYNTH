@@ -1,6 +1,7 @@
 package generator
 
 import (
+	/* "log" */
 	"time"
 
 	"hodei.naiz/simplesynth/synth/midi"
@@ -14,6 +15,14 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
+/* func TestTimeController(voice *Voice) {
+	go func() {
+		for *voice.TimeControl < 1000.00 {
+			log.Println(*voice.TimeControl)
+			*voice.TimeControl++
+		}
+	}()
+} */
 func (adsr *ADSR) ADSRforPoly(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl) {
 
 	a := adsrCtrl.AttackTime
