@@ -42,7 +42,7 @@ func main() {
 	/***
 
 	TESTING POLYPHONY*/
-	vmanager := generator.PolyInit(bufferSize, 10)
+	vmanager := generator.PolyInit(bufferSize, 2, controller)
 
 	//**********************************************gui****************************************************************
 

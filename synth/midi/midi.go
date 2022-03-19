@@ -18,7 +18,7 @@ type MidiMsg struct {
 }
 
 /*old method*/
-func IsOn(midimsg []MidiMsg) bool {
+/* func IsOn(midimsg []MidiMsg) bool {
 
 	if midimsg[len(midimsg)-1].On || !midimsg[len(midimsg)-1].On && midimsg[len(midimsg)-1].Key != midimsg[len(midimsg)-2].Key && midimsg[len(midimsg)-2].On {
 		return true
@@ -26,7 +26,7 @@ func IsOn(midimsg []MidiMsg) bool {
 		return false
 	}
 	return false
-}
+} */
 func RunMidi(midimsg *MidiMsg) {
 	defer func() {
 		if error := recover(); error != nil {
@@ -60,7 +60,7 @@ func RunMidi(midimsg *MidiMsg) {
 		// format every message
 		reader.Each(func(pos *reader.Position, msg midi.Message) {
 
-			//log.Printf("FIRST%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
+			//	log.Printf("FIRST%s %s\n", strings.Fields(msg.String())[0], strings.Fields(msg.String())[4])
 			thekey, errK := strconv.ParseInt(strings.Fields(msg.String())[4], 10, 64)
 			must(errK)
 			midimsg.Key = int(thekey)

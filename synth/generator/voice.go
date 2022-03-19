@@ -21,19 +21,21 @@ type FoundKey struct {
 	Key   int
 }
 
-func setupVoice(bufferSize int) *Voice {
+func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc := Oscillator(bufferSize)
-	adsr := ADSR{AttackTime: 1000.00, DecayTime: 2000.00, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.01}
+	//adsr := ADSR{AttackTime: 1000.00, DecayTime: 2000.00, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.01}
+	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
+
 	osc.Osc.Amplitude = 0.01
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
 	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: &timeControl, ADSR: &adsr}
 }
-func PolyInit(bufferSize int, amountOfVoices int) VoiceManager {
+func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
 	var voices []*Voice
 	i := 0
 	for i <= amountOfVoices {
-		voices = append(voices, setupVoice(bufferSize))
+		voices = append(voices, setupVoice(bufferSize, controller))
 
 		i++
 	}
@@ -73,7 +75,6 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg) {
 			/* if *vManager.Voices[voiceIndex].TimeControl < value {
 				vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude += 0.01
 			} */
-			log.Println("TCONTROL", vManager.Voices[voiceIndex].TimeControl)
 
 		}
 	}
@@ -113,5 +114,7 @@ func (vManager *VoiceManager) timeControlCounter() {
 func (vManager *VoiceManager) adsrRun(controller Controls) {
 	for _, voice := range vManager.Voices {
 		voice.ADSR.ADSRforPoly(voice.Midi, voice.Oscillator, voice.TimeControl, controller.ADSRcontrol)
+		//	log.Println("TCONTROL", *vManager.Voices[0].TimeControl, *vManager.Voices[1].TimeControl)
+
 	}
 }
