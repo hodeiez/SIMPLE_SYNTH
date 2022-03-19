@@ -71,10 +71,6 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg) {
 		} else {
 			vManager.Voices[voiceIndex].Midi = midimsg
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
-			//value := float64(1000.00)
-			/* if *vManager.Voices[voiceIndex].TimeControl < value {
-				vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude += 0.01
-			} */
 
 		}
 	}
@@ -85,36 +81,19 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg) {
 
 		vManager.Voices[foundKey.Index].Midi.On = false
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-		/* if *vManager.Voices[foundKey.Index].TimeControl == 0.0 {
-			vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude = 0.0000
-		} */
-		//	log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
 	}
 }
 
 func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
+	vManager.adsrRun(controller)
 	VoiceOnNoteOn(vManager, midimsg)
 	VoiceOnNoteOff(vManager, midimsg)
-	//vManager.timeControlCounter()
-	vManager.adsrRun(controller)
 
-	//log.Println("Assigned", vManager.Voices[0], vManager.Voices[1])
 }
 
-/*
-func (vManager *VoiceManager) timeControlCounter() {
-	for _, voice := range vManager.Voices {
-		if voice.Midi.On {
-			*voice.TimeControl++
-		} else if !voice.Midi.On {
-			*voice.TimeControl = 0
-		}
-	}
-} */
 func (vManager *VoiceManager) adsrRun(controller Controls) {
 	for _, voice := range vManager.Voices {
-		voice.ADSR.ADSRforPoly(voice.Midi, voice.Oscillator, voice.TimeControl, controller.ADSRcontrol)
-		//	log.Println("TCONTROL", *vManager.Voices[0].TimeControl, *vManager.Voices[1].TimeControl)
+		voice.ADSRforPoly(controller.ADSRcontrol)
 
 	}
 }

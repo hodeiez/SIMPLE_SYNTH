@@ -28,21 +28,10 @@ func main() {
 
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
 	controller := generator.Controls{SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
-	//--------------------------------------------
-	//---------------------------midi notes------------------------------
-	//midiMessages := []midi.MidiMsg{{Key: -1, On: false}, {Key: 0, On: false}}
-	midiMessages := midi.MidiMsg{Key: -1, On: false}
-	//--------------------------------------------------------------------------------
-	//------------------------------ADSR-----------------------------------------------
-	//adsr := generator.ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
-	/* pos := 0.0
-	pos2 := 0.0 */
-	//----------------------------------------------------------------------------------
-	//************************************************************************************************
-	/***
 
-	TESTING POLYPHONY*/
-	vmanager := generator.PolyInit(bufferSize, 2, controller)
+	midiMessages := midi.MidiMsg{Key: -1, On: false}
+
+	vmanager := generator.PolyInit(bufferSize, 4, controller)
 
 	//**********************************************gui****************************************************************
 
@@ -66,7 +55,7 @@ func main() {
 	//thread for audio
 	go func() {
 
-		start := dsp.DspConf{BufferSize: bufferSize, Oscs: []*generator.Osc{vmanager.Voices[0].Oscillator, vmanager.Voices[1].Oscillator}}
+		start := dsp.DspConf{BufferSize: bufferSize, Oscs: []*generator.Osc{vmanager.Voices[0].Oscillator, vmanager.Voices[1].Oscillator, vmanager.Voices[2].Oscillator, vmanager.Voices[3].Oscillator}}
 		dsp.Run(start)
 	}()
 
@@ -75,9 +64,6 @@ func main() {
 	//TODO: refactor adsr to voice
 	for {
 
-		/* 	adsr.ADSR(midiMessages, vmanager.Voices[0].Oscillator, &vmanager.Voices[0].TimeControl, controller.ADSRcontrol, &currentNote)
-		adsr.ADSR(midiMessages, vmanager.Voices[1].Oscillator, &vmanager.Voices[1].TimeControl, controller.ADSRcontrol, &currentNote)
-		*/
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[0].Oscillator)
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[1].Oscillator)
 		generator.RunPolly(vmanager, midiMessages, controller)

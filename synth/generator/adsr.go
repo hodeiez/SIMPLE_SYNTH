@@ -15,48 +15,40 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-/* func TestTimeController(voice *Voice) {
-	go func() {
-		for *voice.TimeControl < 1000.00 {
-			log.Println(*voice.TimeControl)
-			*voice.TimeControl++
-		}
-	}()
-} */
-func (adsr *ADSR) ADSRforPoly(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl) {
+func (voice *Voice) ADSRforPoly(adsrCtrl *ADSRControl) {
 
 	a := adsrCtrl.AttackTime
 	d := adsrCtrl.DecayTime
 	s := adsrCtrl.SustainAmp
 	r := adsrCtrl.ReleaseTime
 
-	if midimsg.On {
+	if voice.Midi.On {
 
-		if *pos < *a && osc.Osc.Amplitude < 1 { //ATTACK
+		if *voice.TimeControl < *a && voice.Oscillator.Osc.Amplitude < 1 { //ATTACK
 
-			osc.Osc.Amplitude += 1 / *a
-		} else if *pos > *a && *pos < *a+*d { //DECAY
+			voice.Oscillator.Osc.Amplitude += 1 / *a
+		} else if *voice.TimeControl > *a && *voice.TimeControl < *a+*d { //DECAY
 
-			if osc.Osc.Amplitude > adsr.SustainAmp {
-				osc.Osc.Amplitude -= (1 / *d)
+			if voice.Oscillator.Osc.Amplitude > voice.ADSR.SustainAmp {
+				voice.Oscillator.Osc.Amplitude -= (1 / *d)
 
 			}
-		} else if *pos >= *a+*d { //SUSTAIN
+		} else if *voice.TimeControl >= *a+*d { //SUSTAIN
 
-			osc.Osc.Amplitude = *s
+			voice.Oscillator.Osc.Amplitude = *s
 
 		}
-		adsr.ControlAmp = osc.Osc.Amplitude
-		*pos++
+		voice.ADSR.ControlAmp = voice.Oscillator.Osc.Amplitude
+		*voice.TimeControl++
 		//this goes to noteOff in voice
-	} else if !midimsg.On {
+	} else if !voice.Midi.On {
 
-		*pos = 0.0
+		*voice.TimeControl = 0.0
 
-		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
-			osc.Osc.Amplitude -= (adsr.ControlAmp / *r)
+		if voice.Oscillator.Osc.Amplitude > 0.0 && voice.ADSR.ControlAmp != 0.0 {
+			voice.Oscillator.Osc.Amplitude -= (voice.ADSR.ControlAmp / *r)
 		} else {
-			osc.Osc.Amplitude = 0
+			voice.Oscillator.Osc.Amplitude = 0
 
 		}
 
