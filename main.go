@@ -31,7 +31,7 @@ func main() {
 
 	midiMessages := midi.MidiMsg{Key: -1, On: false}
 
-	vmanager := generator.PolyInit(bufferSize, 4, controller)
+	vmanager := generator.PolyInit(bufferSize, 1, controller)
 
 	//**********************************************gui****************************************************************
 
@@ -55,17 +55,15 @@ func main() {
 	//thread for audio
 	go func() {
 
-		start := dsp.DspConf{BufferSize: bufferSize, Oscs: []*generator.Osc{vmanager.Voices[0].Oscillator, vmanager.Voices[1].Oscillator, vmanager.Voices[2].Oscillator, vmanager.Voices[3].Oscillator}}
+		start := dsp.DspConf{BufferSize: bufferSize, VM: &vmanager}
 		dsp.Run(start)
 	}()
 
 	//evaluate and execute changes
-	//	currentNote := midi.MidiMsg{-1, false}
-	//TODO: refactor adsr to voice
+
 	for {
 
-		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[0].Oscillator)
-		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices[1].Oscillator)
+		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
 		generator.RunPolly(vmanager, midiMessages, controller)
 
 	}

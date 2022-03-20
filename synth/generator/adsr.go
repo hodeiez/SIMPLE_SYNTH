@@ -3,8 +3,6 @@ package generator
 import (
 	/* "log" */
 	"time"
-
-	"hodei.naiz/simplesynth/synth/midi"
 )
 
 type ADSR struct {
@@ -15,6 +13,7 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
+//TODO: fix values and refactor to one method
 func (voice *Voice) ADSRforPoly(adsrCtrl *ADSRControl) {
 
 	a := adsrCtrl.AttackTime
@@ -24,9 +23,9 @@ func (voice *Voice) ADSRforPoly(adsrCtrl *ADSRControl) {
 
 	if voice.Midi.On {
 
-		if *voice.TimeControl < *a && voice.Oscillator.Osc.Amplitude < 1 { //ATTACK
+		if *voice.TimeControl < *a && voice.Oscillator.Osc.Amplitude < 0.1 { //ATTACK
 
-			voice.Oscillator.Osc.Amplitude += 1 / *a
+			voice.Oscillator.Osc.Amplitude += 0.1 / *a
 		} else if *voice.TimeControl > *a && *voice.TimeControl < *a+*d { //DECAY
 
 			if voice.Oscillator.Osc.Amplitude > voice.ADSR.SustainAmp {
@@ -49,49 +48,6 @@ func (voice *Voice) ADSRforPoly(adsrCtrl *ADSRControl) {
 			voice.Oscillator.Osc.Amplitude -= (voice.ADSR.ControlAmp / *r)
 		} else {
 			voice.Oscillator.Osc.Amplitude = 0
-
-		}
-
-	}
-
-	time.Sleep(1 * time.Nanosecond)
-}
-func (adsr *ADSR) ADSR(midimsg midi.MidiMsg, osc *Osc, pos *float64, adsrCtrl *ADSRControl, currentNote *midi.MidiMsg) {
-
-	a := adsrCtrl.AttackTime
-	d := adsrCtrl.DecayTime
-	s := adsrCtrl.SustainAmp
-	r := adsrCtrl.ReleaseTime
-
-	if midimsg.On {
-		*currentNote = midimsg
-	}
-	if midimsg.On {
-
-		if *pos < *a && osc.Osc.Amplitude < 0.6 { //ATTACK
-
-			osc.Osc.Amplitude += 0.6 / *a
-		} else if *pos > *a && *pos < *a+*d { //DECAY
-
-			if osc.Osc.Amplitude > adsr.SustainAmp {
-				osc.Osc.Amplitude -= (1 / *d)
-
-			}
-		} else if *pos >= *a+*d { //SUSTAIN
-
-			osc.Osc.Amplitude = *s
-
-		}
-		adsr.ControlAmp = osc.Osc.Amplitude
-		*pos++
-	} else if !midimsg.On && currentNote.Key == midimsg.Key {
-
-		*pos = 0.0
-
-		if osc.Osc.Amplitude > 0.0 && adsr.ControlAmp != 0.0 {
-			osc.Osc.Amplitude -= (adsr.ControlAmp / *r)
-		} else {
-			osc.Osc.Amplitude = 0
 
 		}
 

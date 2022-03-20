@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"log"
-
 	"hodei.naiz/simplesynth/synth/midi"
 )
 
@@ -23,7 +21,6 @@ type FoundKey struct {
 
 func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc := Oscillator(bufferSize)
-	//adsr := ADSR{AttackTime: 1000.00, DecayTime: 2000.00, SustainAmp: 0.08, ReleaseTime: 2000.00, ControlAmp: 0.01}
 	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime, SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 
 	osc.Osc.Amplitude = 0.01
@@ -34,7 +31,7 @@ func setupVoice(bufferSize int, controller Controls) *Voice {
 func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
 	var voices []*Voice
 	i := 0
-	for i <= amountOfVoices {
+	for i < amountOfVoices {
 		voices = append(voices, setupVoice(bufferSize, controller))
 
 		i++
@@ -65,10 +62,7 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg) {
 	foundKey := VoicesHasKey(midimsg, vManager)
 	if midimsg.On && foundKey.Index == -1 {
 		voiceIndex := vManager.FindFreeVoice()
-		if voiceIndex == -1 {
-			log.Println("Not free", vManager.Voices[0], vManager.Voices[1])
-
-		} else {
+		if voiceIndex != -1 {
 			vManager.Voices[voiceIndex].Midi = midimsg
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
 
