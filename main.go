@@ -29,12 +29,11 @@ func main() {
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
 	controller := generator.Controls{SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 
-	midiMessages := midi.MidiMsg{Key: -1, On: false}
-
-	vmanager := generator.PolyInit(bufferSize, 1, controller)
+	vmanager := generator.PolyInit(bufferSize, 6, controller)
 
 	//**********************************************gui****************************************************************
-
+	msg := make(chan midi.MidiMsg)
+	//	raw := make(chan string)
 	go func() {
 
 		w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
@@ -49,7 +48,7 @@ func main() {
 	//thread for midi
 	go func() {
 
-		midi.RunMidi(&midiMessages)
+		midi.RunMidi(msg)
 
 	}()
 	//thread for audio
@@ -59,12 +58,21 @@ func main() {
 		dsp.Run(start)
 	}()
 
-	//evaluate and execute changes
-
 	for {
-
+		//log.Println(<-chann)
+		//	log.Println("in main", midi.ToMidiMsg(<-raw))
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
-		generator.RunPolly(vmanager, midiMessages, controller)
+		generator.RunPolly(vmanager, <-msg, controller)
+		/* log.Println("[1]", *vmanager.Voices[0].TimeControl, *&vmanager.Voices[0].Midi.Key, "|", "[2]", *vmanager.Voices[1].TimeControl, *&vmanager.Voices[1].Midi.Key, "|",
+		"[3]", *vmanager.Voices[2].TimeControl, *&vmanager.Voices[2].Midi.Key, "|", "[4]", *vmanager.Voices[3].TimeControl, *&vmanager.Voices[3].Midi.Key, "|",
+		"[5]", *vmanager.Voices[4].TimeControl, *&vmanager.Voices[4].Midi.Key, "|", "[6]", *vmanager.Voices[5].TimeControl, *&vmanager.Voices[5].Midi.Key)
+		*/
+		/* log.Println("[1]", vmanager.Voices[0].TimeControl, *&vmanager.Voices[0].Midi.Key, "|", "[2]", vmanager.Voices[1].TimeControl, *&vmanager.Voices[1].Midi.Key, "|",
+		"[3]", vmanager.Voices[2].TimeControl, *&vmanager.Voices[2].Midi.Key, "|", "[4]", vmanager.Voices[3].TimeControl, *&vmanager.Voices[3].Midi.Key, "|",
+		"[5]", vmanager.Voices[4].TimeControl, *&vmanager.Voices[4].Midi.Key, "|", "[6]", vmanager.Voices[5].TimeControl, *&vmanager.Voices[5].Midi.Key)
+		*/
+		//	vmanager.AdsrRun(controller)
+		//log.Println("d")
 
 	}
 
