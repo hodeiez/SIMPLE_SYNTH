@@ -11,6 +11,7 @@ A simple synth made using golang
 <li>four wave type can be selected (square wave needs to be fixed)</li>
 <li>A simple gui running where wave type selector is functional</li>
 <li>A simple ADSR working controlled via GUI</li>
+<li>Basic configurable polyphony </li>
 </ul>
 <image src="synthPic.png"/>
 <h5>actual project status (a wave selector, and an ADSR envelope)</h5>
@@ -23,10 +24,12 @@ A simple synth made using golang
 </ul>
 <h2>Future features</h2>
 <ul>
-<li>Polyphony</li>
 <li>Velocity sensitivity</li>
 <li>AM/FM modulation</li>
 <li>Low pass effect</li>
 <li>Delay effect</li>
+<li>Volume control</li>
+<li>Dual oscillator</li>
+<li>LFO</li>
 </ul>
 </body></html>

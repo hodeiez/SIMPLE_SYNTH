@@ -176,18 +176,6 @@ if voice.Midi.On {
 // 	time.Sleep(1 * time.Nanosecond)
 // }
 
-func run(time *float64, run bool) {
-
-	for {
-		if run {
-			*time++
-		} else {
-			break
-		}
-	}
-
-}
-
 // func (voice *Voice) ADSRon(adsrCtrl *ADSRControl) {
 
 // 	a := adsrCtrl.AttackTime

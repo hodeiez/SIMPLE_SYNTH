@@ -11,6 +11,7 @@ type Voice struct {
 	TimeControl float64
 	Midi        midi.MidiMsg
 	ADSR        *ADSR
+	Quit        chan bool
 }
 
 type VoiceManager struct {
@@ -29,7 +30,9 @@ func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc.Osc.Amplitude = 0.0
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
-	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: timeControl, ADSR: &adsr}
+	quit := make(chan bool)
+
+	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: timeControl, ADSR: &adsr, Quit: quit}
 }
 func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
 	var voices []*Voice
@@ -63,7 +66,7 @@ func VoicesHasKey(midimsg midi.MidiMsg, vManager VoiceManager) FoundKey {
 	return FoundKey{-1, -1}
 }
 func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
-	//log.Println(midimsg)
+
 	foundKey := VoicesHasKey(midimsg, vManager)
 	if midimsg.On && foundKey.Index == -1 {
 		voiceIndex := vManager.FindFreeVoice()
@@ -71,65 +74,66 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 			vManager.Voices[voiceIndex].Midi = midimsg
 
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
-			vManager.Voices[voiceIndex].runTimeControl()
+			vManager.Voices[voiceIndex].Quit = make(chan bool)
+			go vManager.Voices[voiceIndex].adsrDraft(controller)
 		}
 	}
 }
 func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 	foundKey := VoicesHasKey(midimsg, vManager)
 	if !midimsg.On && foundKey.Index != -1 {
-		//allSameKeyOff(&vManager, midimsg, controller)
-		vManager.Voices[foundKey.Index].Midi = midimsg
 
-		vManager.Voices[foundKey.Index].stopControl()
+		vManager.Voices[foundKey.Index].Midi = midimsg
+		vManager.Voices[foundKey.Index].Midi.Key = -1
+		go vManager.Voices[foundKey.Index].stopAdsrDraft(controller)
 	}
 	//	}
 }
-func allSameKeyOff(vManager *VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 
-	for _, voice := range vManager.Voices {
-		if voice.Midi.Key == midimsg.Key {
-			voice.Midi.On = false
-
-		}
-	}
-}
 func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 
 	VoiceOnNoteOn(vManager, midimsg, controller)
 	VoiceOnNoteOff(vManager, midimsg, controller)
 
-	//	go vManager.runTimer()
-	//vManager.adsrRun(controller)
-	//	log.Println(*<-vManager.Voices[0].TimeControl, *<-vManager.Voices[1].TimeControl, *<-vManager.Voices[2].TimeControl, *<-vManager.Voices[3].TimeControl, *<-vManager.Voices[4].TimeControl, *<-vManager.Voices[5].TimeControl)
-	//	log.Println(*vManager.Voices[0].TimeControl, *vManager.Voices[1].TimeControl, *vManager.Voices[2].TimeControl, *vManager.Voices[3].TimeControl, *vManager.Voices[4].TimeControl, *vManager.Voices[5].TimeControl)
 }
 
-func (vManager *VoiceManager) adsrRun(controller Controls) {
+//TODO: fix values, review logic and refactor adsr to adsr file
+func (voice *Voice) adsrDraft(controller Controls) {
 
-	//	for _, voice := range vManager.Voices {
+loop:
+	for {
 
-	//	voice.ADSRforPoly(controller.ADSRcontrol)
+		select {
+		case <-voice.Quit:
 
-	//	}
-}
-func (voice *Voice) runTimeControl() {
+			break loop
+		default:
 
-	//for voice.Oscillator.Osc.Amplitude < 2 {
-	//voice.Oscillator.Osc.Amplitude = 0.1
-	go func() { //ATTACK, call to end
-		for {
-			voice.Oscillator.Osc.Amplitude += 0.00001
-			time.Sleep(1 * time.Millisecond)
+			voice.TimeControl += 0.1
+			if *controller.ADSRcontrol.AttackTime*10000 > voice.TimeControl {
+				voice.Oscillator.Osc.Amplitude += (1 / (*controller.ADSRcontrol.AttackTime * 10000000))
+			} else if *controller.ADSRcontrol.AttackTime*10000+*controller.ADSRcontrol.DecayTime*10000 > voice.TimeControl && *controller.ADSRcontrol.SustainAmp < voice.Oscillator.Osc.Amplitude {
+				voice.Oscillator.Osc.Amplitude -= (1 / (*controller.ADSRcontrol.DecayTime * 10000000))
+			}
+
+			continue
 		}
-	}()
-	//	time.Sleep(1 * time.Millisecond)
-	//voice.TimeControl++
 
-	//	}
+	}
 
 }
-func (voice *Voice) stopControl() {
-	//	voice.TimeControl = 0.0
-	voice.Oscillator.Osc.Amplitude = 0.0
+func (voice *Voice) stopAdsrDraft(controller Controls) {
+	voice.Quit <- true
+	voice.TimeControl = 0
+	if voice.Oscillator.Osc.Amplitude > 0.0 {
+		for i := *controller.ADSRcontrol.ReleaseTime * 10000000000; i >= 0; i-- {
+			time.Sleep(1 * time.Nanosecond)
+			if voice.Oscillator.Osc.Amplitude <= 0.0 {
+				break
+			} else {
+				voice.Oscillator.Osc.Amplitude -= 0.00001
+			}
+		}
+	}
+
 }

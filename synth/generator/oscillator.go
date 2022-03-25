@@ -14,7 +14,6 @@ import (
 )
 
 type Osc struct {
-	MyAmplitude *float64
 	gainControl float64
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
@@ -62,7 +61,7 @@ func Oscillator(bufferSize int) Osc {
 	signal.Notify(sig, os.Interrupt, os.Kill)
 
 	log.Println("oscillator running")
-	return Osc{&osc.Amplitude, 0.0, osc, buf}
+	return Osc{0.0, osc, buf}
 
 }
 
