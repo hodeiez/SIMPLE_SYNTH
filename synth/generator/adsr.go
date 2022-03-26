@@ -14,7 +14,7 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-//TODO: fix values, review logic and refactor adsr to adsr file
+//TODO: make dynamic to accept other parameters to apply (cutoff, pitch,...)
 func (voice *Voice) RunADSR(controller Controls) {
 	if voice.Midi.On {
 	loop:
