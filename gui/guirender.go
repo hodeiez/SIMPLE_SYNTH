@@ -28,7 +28,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 	var ops op.Ops
 	//init
 	selector := components.CreateSelector(th)
-	sliders := []components.MySlider{components.Slider(th, 1, 1000.0, "A"), components.Slider(th, 1, 1000.0, "D"), components.Slider(th, 0.00, 0.0099, "S"), components.Slider(th, 1, 1000.0, "R")}
+	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.00, 0.0099, "S"), components.Slider(th, 1, 1000000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
 	marginCenter := layout.Inset{Top: unit.Dp(100),
@@ -105,10 +105,10 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 //TODO: move to components and fix values (add beziers?)
 func adsrImage(ops *op.Ops, sliders []components.MySlider) {
 	var path clip.Path
-	attackVal := float32(10) + sliders[0].FloatWidget.Value/20
-	decayVal := attackVal + (sliders[1].FloatWidget.Value / 20)
-	susamp := -20 - (sliders[2].FloatWidget.Value * 100)
-	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20)
+	attackVal := float32(10) + sliders[0].FloatWidget.Value/2000000
+	decayVal := attackVal + (sliders[1].FloatWidget.Value / 2000000)
+	susamp := -20 - (sliders[2].FloatWidget.Value * 6000)
+	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20000000)
 
 	path.Begin(ops)
 	path.MoveTo(f32.Pt(0, -20))
