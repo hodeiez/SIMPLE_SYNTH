@@ -59,20 +59,9 @@ func main() {
 	}()
 
 	for {
-		//log.Println(<-chann)
-		//	log.Println("in main", midi.ToMidiMsg(<-raw))
+
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
 		generator.RunPolly(vmanager, <-msg, controller)
-		/* log.Println("[1]", *vmanager.Voices[0].TimeControl, *&vmanager.Voices[0].Midi.Key, "|", "[2]", *vmanager.Voices[1].TimeControl, *&vmanager.Voices[1].Midi.Key, "|",
-		"[3]", *vmanager.Voices[2].TimeControl, *&vmanager.Voices[2].Midi.Key, "|", "[4]", *vmanager.Voices[3].TimeControl, *&vmanager.Voices[3].Midi.Key, "|",
-		"[5]", *vmanager.Voices[4].TimeControl, *&vmanager.Voices[4].Midi.Key, "|", "[6]", *vmanager.Voices[5].TimeControl, *&vmanager.Voices[5].Midi.Key)
-		*/
-		/* log.Println("[1]", vmanager.Voices[0].TimeControl, *&vmanager.Voices[0].Midi.Key, "|", "[2]", vmanager.Voices[1].TimeControl, *&vmanager.Voices[1].Midi.Key, "|",
-		"[3]", vmanager.Voices[2].TimeControl, *&vmanager.Voices[2].Midi.Key, "|", "[4]", vmanager.Voices[3].TimeControl, *&vmanager.Voices[3].Midi.Key, "|",
-		"[5]", vmanager.Voices[4].TimeControl, *&vmanager.Voices[4].Midi.Key, "|", "[6]", vmanager.Voices[5].TimeControl, *&vmanager.Voices[5].Midi.Key)
-		*/
-		//	vmanager.AdsrRun(controller)
-		//log.Println("d")
 
 	}
 
