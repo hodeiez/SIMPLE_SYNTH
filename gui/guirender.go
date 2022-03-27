@@ -28,7 +28,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 	var ops op.Ops
 	//init
 	selector := components.CreateSelector(th)
-	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.00, 0.0099, "S"), components.Slider(th, 1, 1000000000.0, "R")}
+	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.000001, 0.0099, "S"), components.Slider(th, 1, 100000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
 	marginCenter := layout.Inset{Top: unit.Dp(100),
