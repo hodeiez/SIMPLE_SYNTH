@@ -74,7 +74,7 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 			vManager.Voices[voiceIndex].Midi = midimsg
 
 			vManager.Voices[voiceIndex].Quit = make(chan bool)
-			go vManager.Voices[voiceIndex].RunADSR(controller)
+			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
 		}
 	}
@@ -85,7 +85,7 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 		vManager.Voices[foundKey.Index].Midi = midimsg
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-		go vManager.Voices[foundKey.Index].RunADSR(controller)
+		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
 	}
 
 }
@@ -103,11 +103,19 @@ func (voice *Voice) increaseAmp(amp float64) {
 func (voice *Voice) decreaseAmp(amp float64) {
 	voice.Oscillator.Osc.Amplitude -= amp
 }
-func (voice *Voice) adsrAction(selector string, rate float64) {
+
+//TODO: refactor types (enums?)
+func (voice *Voice) adsrAction(selector string, actionType string, rate float64) {
 	switch selector {
-	case "INCREASE_AMP":
-		voice.increaseAmp(rate)
-	case "DECREASE_AMP":
-		voice.decreaseAmp(rate)
+	case "INCREASE":
+		switch actionType {
+		case "AMP":
+			voice.increaseAmp(rate)
+		}
+	case "DECREASE":
+		switch actionType {
+		case "AMP":
+			voice.decreaseAmp(rate)
+		}
 	}
 }

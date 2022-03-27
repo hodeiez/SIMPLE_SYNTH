@@ -14,8 +14,8 @@ type ADSR struct {
 	ControlAmp  float64
 }
 
-//TODO: make dynamic to accept other parameters to apply (cutoff, pitch,...)
-func (voice *Voice) RunADSR(controller Controls) {
+//TODO: review logic and values
+func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionType string) {
 	if voice.Midi.On {
 	loop:
 		for {
@@ -28,9 +28,9 @@ func (voice *Voice) RunADSR(controller Controls) {
 
 				if *controller.ADSRcontrol.AttackTime > voice.TimeControl {
 
-					voice.adsrAction("INCREASE_AMP", 1/(*controller.ADSRcontrol.AttackTime*1000))
-				} else if *controller.ADSRcontrol.AttackTime+*controller.ADSRcontrol.DecayTime > voice.TimeControl && *controller.ADSRcontrol.SustainAmp < voice.Oscillator.Osc.Amplitude {
-					voice.adsrAction("DECREASE_AMP", 1/(*controller.ADSRcontrol.DecayTime*1000))
+					voice.adsrAction("INCREASE", actionType, 1/(*controller.ADSRcontrol.AttackTime*1000))
+				} else if *controller.ADSRcontrol.AttackTime+*controller.ADSRcontrol.DecayTime > voice.TimeControl && *controller.ADSRcontrol.SustainAmp < *controlRate {
+					voice.adsrAction("DECREASE", actionType, 1/(*controller.ADSRcontrol.DecayTime*1000))
 
 				}
 
@@ -41,12 +41,13 @@ func (voice *Voice) RunADSR(controller Controls) {
 		}
 	} else if !voice.Midi.On {
 		voice.Quit <- true
+		zero := 0.0
 		for {
-			if voice.Oscillator.Osc.Amplitude <= 0 {
+			if *controlRate <= zero {
 				voice.TimeControl = 0.0
 				break
 			}
-			voice.adsrAction("DECREASE_AMP", 1/(*controller.ADSRcontrol.ReleaseTime*100))
+			voice.adsrAction("DECREASE", actionType, 1/(*controller.ADSRcontrol.ReleaseTime*100))
 			voice.TimeControl += 0.1
 		}
 	}

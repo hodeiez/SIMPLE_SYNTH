@@ -21,8 +21,11 @@ func CreateSelector(th *material.Theme) Selector {
 	widget2 := &widget.Clickable{}
 	buttonUp := material.Button(th, widget1, "->")
 	buttonDown := material.Button(th, widget2, "<-")
-	buttonDown.CornerRadius = unit.Dp(10)
-
+	//	buttonDown.CornerRadius = unit.Dp(10)
+	buttonDown.TextSize = unit.Dp(10)
+	buttonUp.TextSize = unit.Dp(10)
+	buttonDown.Inset = layout.Inset{unit.Dp(3), unit.Dp(3), unit.Dp(3), unit.Dp(3)}
+	buttonUp.Inset = layout.Inset{unit.Dp(3), unit.Dp(3), unit.Dp(3), unit.Dp(3)}
 	buttonUp.Background = color.NRGBA{0, 0, 0, 255}
 	buttonDown.Background = color.NRGBA{0, 0, 0, 255}
 	display := material.Label(th, unit.Dp(10), "")
