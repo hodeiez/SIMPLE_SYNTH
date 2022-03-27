@@ -7,7 +7,8 @@ type ADSRControl struct {
 	ReleaseTime *float64
 }
 type Controls struct {
-	SelectorFunc *MyWaveType
-	ADSRcontrol  *ADSRControl
-	ShowAmp      *float64
+	SelectorFunc  *MyWaveType
+	SelectorFunc2 *MyWaveType
+	ADSRcontrol   *ADSRControl
+	ShowAmp       *float64
 }

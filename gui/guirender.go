@@ -28,7 +28,8 @@ func Render(w *app.Window, controller *generator.Controls) error {
 	var ops op.Ops
 	//init
 	selector := components.CreateSelector(th)
-	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.000001, 0.0099, "S"), components.Slider(th, 1, 100000000.0, "R")}
+	selector2 := components.CreateSelector(th)
+	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 100000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
 	marginCenter := layout.Inset{Top: unit.Dp(100),
@@ -46,6 +47,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		case system.FrameEvent:
 
 			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
+			components.SelectorCounter(selector2.ButtonUp.ClickWidget, selector2.ButtonDown.ClickWidget, controller.SelectorFunc2)
 
 			bindControls(controller.ADSRcontrol, sliders)
 			gtx := layout.NewContext(&ops, e)
@@ -86,8 +88,40 @@ func Render(w *app.Window, controller *generator.Controls) error {
 				)
 
 			})
-			layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			/* layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
+			}) */
+			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+
+				return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center)}.Layout(gtx,
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
+							}),
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return material.Label(th, unit.Dp(10), "Pitch").Layout(gtx)
+							}),
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return material.Label(th, unit.Dp(10), "VOLUME?").Layout(gtx)
+							}),
+						)
+					}),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return components.ShowSelector(th, gtx, &selector2, controller.SelectorFunc2)
+							}),
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return material.Label(th, unit.Dp(10), "Pitch").Layout(gtx)
+							}),
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return material.Label(th, unit.Dp(10), "VOLUME?").Layout(gtx)
+							}),
+						)
+					}),
+				)
+
 			})
 
 			e.Frame(gtx.Ops)

@@ -16,6 +16,7 @@ type Selector struct {
 	Display    material.LabelStyle
 }
 
+//TODO clean and set styles in MyButton
 func CreateSelector(th *material.Theme) Selector {
 	widget1 := &widget.Clickable{}
 	widget2 := &widget.Clickable{}

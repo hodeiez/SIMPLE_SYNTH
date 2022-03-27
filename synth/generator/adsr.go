@@ -30,12 +30,13 @@ func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionTyp
 
 				break loop
 			default:
-				if aTime == 1 {
-					voice.Oscillator.Osc.Amplitude = 0.01
 
-				} else if aTime > voice.TimeControl && voice.TimeControl < aTime+dTime && aTime != 1 {
-
-					voice.adsrAction("INCREASE", actionType, 1/(aTime*1000))
+				if aTime > voice.TimeControl && voice.TimeControl < aTime+dTime {
+					if aTime == 1 {
+						voice.Oscillator.Osc.Amplitude = 0.01
+					} else if aTime != 1 {
+						voice.adsrAction("INCREASE", actionType, 1/(aTime*1000))
+					}
 				} else if aTime+dTime > voice.TimeControl && sAmp < *controlRate {
 					voice.adsrAction("DECREASE", actionType, 1/(dTime*1000))
 

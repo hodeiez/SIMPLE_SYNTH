@@ -19,6 +19,8 @@ func main() {
 
 	//--------------------controllers------------------
 	count := generator.Triangle
+	count2 := generator.Sine
+
 	attackCtrl := 1000.00
 	decayCtrl := 2000.00
 	susCtrl := 0.08
@@ -27,7 +29,7 @@ func main() {
 	amplitudeVal := 0.0
 
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
-	controller := generator.Controls{SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
+	controller := generator.Controls{SelectorFunc2: &count2, SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 
 	vmanager := generator.PolyInit(bufferSize, 6, controller)
 
