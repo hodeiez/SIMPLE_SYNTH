@@ -88,13 +88,11 @@ func Render(w *app.Window, controller *generator.Controls) error {
 				)
 
 			})
-			/* layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
-			}) */
+			//TODO: refactor to component
 			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 
-				return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center)}.Layout(gtx,
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center), WeightSum: 20}.Layout(gtx,
+					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
@@ -107,7 +105,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 							}),
 						)
 					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return components.ShowSelector(th, gtx, &selector2, controller.SelectorFunc2)

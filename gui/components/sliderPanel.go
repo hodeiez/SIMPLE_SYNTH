@@ -27,6 +27,7 @@ func ShowADSRPanel(th *material.Theme, gtx layout.Context, panel SliderPanel) la
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 
 				layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+
 					return panel.Sliders[0].StyledSlide.Layout(gtx)
 
 				}),
