@@ -22,6 +22,7 @@ func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionTyp
 	rTime := *controller.ADSRcontrol.ReleaseTime
 	if voice.Midi.On {
 		voice.Oscillator.Osc.Amplitude = 0.0
+		voice.Oscillator2.Osc.Amplitude = 0.0
 	loop:
 		for {
 
@@ -34,6 +35,7 @@ func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionTyp
 				if aTime > voice.TimeControl && voice.TimeControl < aTime+dTime {
 					if aTime == 1 {
 						voice.Oscillator.Osc.Amplitude = 0.01
+						voice.Oscillator2.Osc.Amplitude = 0.01
 					} else if aTime != 1 {
 						voice.adsrAction("INCREASE", actionType, 1/(aTime*1000))
 					}

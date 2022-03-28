@@ -63,6 +63,7 @@ func main() {
 	for {
 
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
+		generator.SelectWave(*controller.SelectorFunc2, vmanager.Voices)
 		generator.RunPolly(vmanager, <-msg, controller)
 
 	}

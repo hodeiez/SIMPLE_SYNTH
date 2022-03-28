@@ -8,6 +8,7 @@ import (
 
 type Voice struct {
 	Oscillator  *Osc
+	Oscillator2 *Osc
 	TimeControl float64
 	Midi        midi.MidiMsg
 	ADSR        *ADSR
@@ -24,15 +25,18 @@ type FoundKey struct {
 
 func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc := Oscillator(bufferSize)
+	osc2 := Oscillator(bufferSize)
 	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime,
 		SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 
 	osc.Osc.Amplitude = 0.0
+	osc2.Osc.Amplitude = 0.0
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
+
 	quit := make(chan bool)
 
-	return &Voice{Oscillator: &osc, Midi: Midi, TimeControl: timeControl, ADSR: &adsr, Quit: quit}
+	return &Voice{Oscillator: &osc, Oscillator2: &osc2, Midi: Midi, TimeControl: timeControl, ADSR: &adsr, Quit: quit}
 }
 func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceManager {
 	var voices []*Voice
@@ -76,6 +80,8 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 			vManager.Voices[voiceIndex].Quit = make(chan bool)
 			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
+			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator2.Osc.Amplitude, "AMP")
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator2)
 		}
 	}
 }
@@ -86,6 +92,7 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 		vManager.Voices[foundKey.Index].Midi = midimsg
 		vManager.Voices[foundKey.Index].Midi.Key = -1
 		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
+		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator2.Osc.Amplitude, "AMP")
 	}
 
 }
@@ -99,9 +106,11 @@ func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) 
 
 func (voice *Voice) increaseAmp(amp float64) {
 	voice.Oscillator.Osc.Amplitude += amp
+	voice.Oscillator2.Osc.Amplitude += amp
 }
 func (voice *Voice) decreaseAmp(amp float64) {
 	voice.Oscillator.Osc.Amplitude -= amp
+	voice.Oscillator2.Osc.Amplitude -= amp
 }
 
 //TODO: refactor types (enums?)
