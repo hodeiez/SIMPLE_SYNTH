@@ -5,9 +5,6 @@ import (
 	"image/color"
 
 	"gioui.org/app"
-	"gioui.org/f32"
-	"gioui.org/op/clip"
-	"gioui.org/op/paint"
 
 	"gioui.org/font/gofont"
 	"gioui.org/io/system"
@@ -57,7 +54,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							adsrImage(&ops, sliders)
+							components.AdsrImage(&ops, sliders)
 							return components.ShowADSRPanel(th, gtx, adsrPanel)
 
 						}),
@@ -132,27 +129,4 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*controller.DecayTime = float64(sliders[1].FloatWidget.Value)
 	*controller.SustainAmp = float64(sliders[2].FloatWidget.Value)
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
-}
-
-//TODO: move to components and fix values (add beziers?)
-func adsrImage(ops *op.Ops, sliders []components.MySlider) {
-	var path clip.Path
-	attackVal := float32(10) + sliders[0].FloatWidget.Value/2000000
-	decayVal := attackVal + (sliders[1].FloatWidget.Value / 2000000)
-	susamp := -20 - (sliders[2].FloatWidget.Value * 6000)
-	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20000000)
-
-	path.Begin(ops)
-	path.MoveTo(f32.Pt(0, -20))
-	path.LineTo(f32.Pt(attackVal, -80))
-	path.LineTo(f32.Pt(decayVal, susamp))
-	path.LineTo(f32.Pt(attackVal+decayVal, susamp))
-	path.LineTo(f32.Pt(releaseVal, -20))
-	color := color.NRGBA{R: 255, A: 255, B: 100}
-	paint.FillShape(ops, color,
-		clip.Stroke{
-			Path:  path.End(),
-			Width: 8,
-		}.Op())
-
 }

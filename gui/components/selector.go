@@ -1,14 +1,13 @@
 package components
 
 import (
-	"image/color"
-
 	"gioui.org/layout"
 	"gioui.org/text"
 
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
@@ -75,7 +74,7 @@ func setButtonStyle(button *material.ButtonStyle) {
 
 	button.Inset = layout.Inset{unit.Dp(5), unit.Dp(5), unit.Dp(5), unit.Dp(5)}
 
-	button.Background = color.NRGBA{200, 0, 0, 255}
+	button.Background = NewMyStyles().colorAccent
 	button.CornerRadius = unit.Dp(10)
 
 }
