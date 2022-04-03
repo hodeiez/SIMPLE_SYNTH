@@ -51,6 +51,7 @@ func Oscillator(bufferSize int) Osc {
 	buf := &audio.FloatBuffer{
 		Data:   make([]float64, bufferSize),
 		Format: audio.FormatMono44100,
+		//Format: audio.FormatMono22500,
 	}
 	//***************************
 	currentNote := 440.0

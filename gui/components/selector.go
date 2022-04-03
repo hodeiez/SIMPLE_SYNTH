@@ -56,7 +56,7 @@ func ShowSelector(th *material.Theme, gtx layout.Context, raw *Selector, texto *
 
 		}),
 
-		layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+		layout.Flexed(2, func(gtx layout.Context) layout.Dimensions {
 			raw.Display.Text = texto.String()
 			raw.Display.Alignment = text.Middle
 			return raw.Display.Layout(gtx)

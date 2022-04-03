@@ -15,7 +15,7 @@ import (
 func main() {
 
 	//**********************************************setup**********************************
-	bufferSize := 64
+	bufferSize := 2048
 
 	//--------------------controllers------------------
 	count := generator.Triangle
@@ -31,7 +31,7 @@ func main() {
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
 	controller := generator.Controls{SelectorFunc2: &count2, SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
 
-	vmanager := generator.PolyInit(bufferSize, 6, controller)
+	vmanager := generator.PolyInit(bufferSize, 3, controller) //4 is max polyphony
 
 	//**********************************************gui****************************************************************
 	msg := make(chan midi.MidiMsg)

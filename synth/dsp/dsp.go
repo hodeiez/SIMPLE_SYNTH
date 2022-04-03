@@ -18,7 +18,11 @@ type DspConf struct {
 func Run(dspConf DspConf) {
 
 	portaudio.Initialize()
+	api, err := portaudio.HostApis()
 
+	for _, ap := range api {
+		log.Println(*ap)
+	}
 	defer portaudio.Terminate()
 	out := make([]float32, dspConf.BufferSize)
 
@@ -58,10 +62,10 @@ func Run(dspConf DspConf) {
 func f64ToF32Mixing(dst []float32, src DspConf) {
 
 	for i := range src.VM.Voices[0].Oscillator.Buf.Data {
-		sum := float32(0.0)
+		sum := 0.0
 		for _, el := range src.VM.Voices {
-			sum += float32(el.Oscillator.Buf.Data[i])
-			dst[i] = sum
+			sum += el.Oscillator.Buf.Data[i]
+			dst[i] = float32(sum)
 
 		}
 
