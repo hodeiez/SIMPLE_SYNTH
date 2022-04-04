@@ -8,7 +8,8 @@ type ADSRControl struct {
 }
 type Controls struct {
 	SelectorFunc  *MyWaveType
-	SelectorFunc2 *MyWaveType
+	SelectorFunc2 *MyWaveType //think on how to apply for second OSC
 	ADSRcontrol   *ADSRControl
 	ShowAmp       *float64
+	Pitch         *float64
 }

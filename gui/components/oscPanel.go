@@ -11,14 +11,15 @@ type OscPanel struct {
 	Margin       *layout.Inset
 	WaveSelector *Selector
 	WaveType     *generator.MyWaveType
+	PitchSlider  MySlider
 }
 
-func NewOscPanel(selector Selector, waveType generator.MyWaveType) OscPanel {
+func NewOscPanel(selector Selector, waveType *generator.MyWaveType, slider MySlider) OscPanel {
 	marginOscPanel := layout.Inset{Top: unit.Dp(0),
 		Bottom: unit.Dp(20),
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(0)}
-	return OscPanel{Margin: &marginOscPanel, WaveSelector: &selector, WaveType: &waveType}
+	return OscPanel{Margin: &marginOscPanel, WaveSelector: &selector, WaveType: waveType, PitchSlider: slider}
 }
 func (oscPanel OscPanel) Render(th *material.Theme) layout.FlexChild {
 	return layout.Flexed(2, func(gtx layout.Context) layout.Dimensions {
@@ -29,13 +30,14 @@ func (oscPanel OscPanel) Render(th *material.Theme) layout.FlexChild {
 					theSelector := ShowSelector(th, gtx, oscPanel.WaveSelector, oscPanel.WaveType)
 					theSelector.Size.X = 200
 					return theSelector
-					//return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
+
 				}),
 				layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
-					label := material.Label(th, unit.Dp(10), "Pitch")
+					label := material.Label(th, unit.Dp(10), oscPanel.PitchSlider.StyledLabel.Text)
 					label.TextSize = unit.Dp(20)
 
-					return label.Layout(gtx)
+					return oscPanel.PitchSlider.StyledSlide.Layout(gtx)
+					//return label.Layout(gtx)
 				}),
 				layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
 					label := material.Label(th, unit.Dp(10), "VOLUME")

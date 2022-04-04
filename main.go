@@ -27,9 +27,10 @@ func main() {
 	relCtrl := 2000.00
 
 	amplitudeVal := 0.0
+	pitch := 0.0
 
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
-	controller := generator.Controls{SelectorFunc2: &count2, SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl}
+	controller := generator.Controls{SelectorFunc2: &count2, SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl, Pitch: &pitch}
 
 	vmanager := generator.PolyInit(bufferSize, 3, controller) //4 is max polyphony
 
@@ -63,6 +64,7 @@ func main() {
 	for {
 
 		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
+
 		generator.RunPolly(vmanager, <-msg, controller)
 
 	}

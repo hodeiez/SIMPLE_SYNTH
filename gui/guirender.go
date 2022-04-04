@@ -25,7 +25,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 	var ops op.Ops
 	//init
 	selector := components.CreateSelector(th)
-	selector2 := components.CreateSelector(th) //A->100000000.0 //D->100000000.0
+	//A->100000000.0 //D->100000000.0
 	sliders := []components.MySlider{components.Slider(th, 1, 100000000000.0, "A"), components.Slider(th, 1, 100000000000.0, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 500000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
@@ -37,12 +37,9 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		Bottom: unit.Dp(0),
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(30)}
-	marginOscPanel := layout.Inset{Top: unit.Dp(0),
-		Bottom: unit.Dp(20),
-		Right:  unit.Dp(0),
-		Left:   unit.Dp(0)}
-	oscPanel1 := components.NewOscPanel(selector, *controller.SelectorFunc)
-	oscPanel2 := components.NewOscPanel(selector2, *controller.SelectorFunc2)
+
+	slider := components.Slider(th, 220.0, 800.0, "pitch")
+	oscPanel1 := components.NewOscPanel(selector, controller.SelectorFunc, slider)
 	//render
 	for {
 
@@ -52,12 +49,10 @@ func Render(w *app.Window, controller *generator.Controls) error {
 			return e.Err
 		case system.FrameEvent:
 
-			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
-			//components.SelectorCounter(selector2.ButtonUp.ClickWidget, selector2.ButtonDown.ClickWidget, controller.SelectorFunc2)
-			//components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, oscPanel1.WaveType)
-			components.SelectorCounter(selector2.ButtonUp.ClickWidget, selector2.ButtonDown.ClickWidget, oscPanel2.WaveType)
+			components.SelectorCounter(oscPanel1.WaveSelector.ButtonUp.ClickWidget, oscPanel1.WaveSelector.ButtonDown.ClickWidget, oscPanel1.WaveType)
 
-			bindControls(controller.ADSRcontrol, sliders)
+			bindControls(controller.ADSRcontrol, sliders, controller, slider)
+
 			gtx := layout.NewContext(&ops, e)
 			layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginCenter.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -100,33 +95,6 @@ func Render(w *app.Window, controller *generator.Controls) error {
 			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginOscPanels.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center), WeightSum: 20}.Layout(gtx,
-						//	oscPanel1.Render(th),
-						//THIS IS A OSCPANNEL
-						layout.Flexed(2, func(gtx layout.Context) layout.Dimensions {
-							return marginOscPanel.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255), WeightSum: 20}.Layout(gtx,
-
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										theSelector := components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
-										theSelector.Size.X = 200
-										return theSelector
-										//return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
-									}),
-									layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
-										label := material.Label(th, unit.Dp(10), "Pitch")
-										label.TextSize = unit.Dp(20)
-
-										return label.Layout(gtx)
-									}),
-									layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
-										label := material.Label(th, unit.Dp(10), "VOLUME")
-										label.TextSize = unit.Dp(20)
-										return label.Layout(gtx)
-									}),
-								)
-							})
-						}),
-
 						oscPanel1.Render(th),
 					)
 
@@ -137,9 +105,11 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		}
 	}
 }
-func bindControls(controller *generator.ADSRControl, sliders []components.MySlider) {
+func bindControls(controller *generator.ADSRControl, sliders []components.MySlider, pitch *generator.Controls, pitchSlide components.MySlider) {
 	*controller.AttackTime = float64(sliders[0].FloatWidget.Value)
 	*controller.DecayTime = float64(sliders[1].FloatWidget.Value)
 	*controller.SustainAmp = float64(sliders[2].FloatWidget.Value)
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
+	*pitch.Pitch = float64(pitchSlide.FloatWidget.Value)
+
 }

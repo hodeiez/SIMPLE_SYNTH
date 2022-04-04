@@ -74,7 +74,7 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 			vManager.Voices[voiceIndex].Midi = midimsg
 
 			vManager.Voices[voiceIndex].Quit = make(chan bool)
-			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator, *controller.Pitch)
 			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 			//go vManager.Voices[voiceIndex].RunADSROn(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 		}
@@ -96,6 +96,7 @@ func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) 
 
 	VoiceOnNoteOn(vManager, midimsg, controller)
 	VoiceOnNoteOff(vManager, midimsg, controller)
+	ChangePitch(*controller.Pitch, vManager.Voices)
 
 }
 

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gordonklaus/portaudio"
+
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
