@@ -3,6 +3,8 @@ package gui
 import (
 	"image"
 	"image/color"
+	"log"
+	"os"
 
 	"gioui.org/app"
 
@@ -38,11 +40,13 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(30)}
 
-	slider := components.Slider(th, 220.0, 800.0, "pitch")
+	slider := components.Slider(th, 120.0, 800.0, "pitch")
 	oscPanel1 := components.NewOscPanel(selector, controller.SelectorFunc, slider)
+	// test <- slider.FloatWidget.Value
 	//render
 	for {
 
+		//close(test)
 		e := <-w.Events()
 		switch e := e.(type) {
 		case system.DestroyEvent:
@@ -103,6 +107,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 			e.Frame(gtx.Ops)
 
 		}
+
 	}
 }
 func bindControls(controller *generator.ADSRControl, sliders []components.MySlider, pitch *generator.Controls, pitchSlide components.MySlider) {
@@ -112,4 +117,13 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
 	*pitch.Pitch = float64(pitchSlide.FloatWidget.Value)
 
+}
+func Run(controller *generator.Controls) {
+	w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
+
+	err := Render(w, controller)
+	if err != nil {
+		log.Fatal(err)
+	}
+	os.Exit(0)
 }

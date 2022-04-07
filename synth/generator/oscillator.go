@@ -98,8 +98,11 @@ func SelectWave(selector MyWaveType, voices []*Voice) {
 	}
 }
 func ChangePitch(pitchValue float64, voices []*Voice) {
-	log.Println(pitchValue)
+
 	for _, o := range voices {
+		//o.PitchMode <- pitchValue
 		o.Oscillator.Retune(pitchValue)
+
 	}
+
 }

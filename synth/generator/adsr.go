@@ -59,6 +59,7 @@ func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionTyp
 			}
 			//voice.adsrAction("DECREASE", actionType, 1/(rTime*100)) //100
 			voice.TimeControl += 0.1 //0.1
+
 		}
 	}
 
