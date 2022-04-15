@@ -40,6 +40,7 @@ func Run(dspConf DspConf) {
 	defer stream.Stop()
 
 	for {
+
 		// populate the out buffer
 
 		for _, oscillators := range dspConf.VM.Voices {
@@ -50,7 +51,6 @@ func Run(dspConf DspConf) {
 		}
 
 		f64ToF32Mixing(out, dspConf)
-
 		// write to the stream
 		if err := stream.Write(); err != nil {
 			log.Printf("error writing to stream : %v\n", err)

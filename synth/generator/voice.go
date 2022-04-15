@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"log"
 	"time"
 
 	"hodei.naiz/simplesynth/synth/midi"
@@ -27,7 +28,7 @@ func setupVoice(bufferSize int, controller Controls) *Voice {
 	adsr := ADSR{AttackTime: *controller.ADSRcontrol.AttackTime, DecayTime: *controller.ADSRcontrol.DecayTime,
 		SustainAmp: *controller.ADSRcontrol.SustainAmp, ReleaseTime: *controller.ADSRcontrol.ReleaseTime, ControlAmp: 0.01}
 
-	osc.Osc.Amplitude = 0.0
+	osc.Osc.Amplitude = 0.1
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
 	quit := make(chan bool)
@@ -40,7 +41,6 @@ func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceMana
 	i := 0
 	for i < amountOfVoices {
 		voices = append(voices, setupVoice(bufferSize, controller))
-
 		i++
 	}
 	return VoiceManager{Voices: voices}
@@ -74,10 +74,8 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 		if voiceIndex != -1 {
 			vManager.Voices[voiceIndex].Midi = midimsg
 
-			vManager.Voices[voiceIndex].Quit = make(chan bool)
-			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator, *controller.Pitch)
-			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
-			//go vManager.Voices[voiceIndex].RunADSROn(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
+			//go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 
 		}
 	}
@@ -88,19 +86,24 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 		vManager.Voices[foundKey.Index].Midi = midimsg
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
+		//go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
 		//ChangePitch(*controller.Pitch, vManager.Voices)
-		//go vManager.Voices[foundKey.Index].RunADSROff(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
 
 	}
 
 }
 
-func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
+func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls, test chan float64, pitch float64) {
 
 	VoiceOnNoteOn(vManager, midimsg, controller)
 	VoiceOnNoteOff(vManager, midimsg, controller)
-	go ChangePitch(*controller.Pitch, vManager.Voices)
+	select {
+	case <-test:
+		pitch = <-test
+		ChangePitch2(pitch, vManager.Voices)
+	default:
+		ChangePitch2(pitch, vManager.Voices)
+	}
 
 }
 
@@ -125,4 +128,15 @@ func (voice *Voice) adsrAction(selector string, actionType string, rate float64)
 			voice.decreaseAmp(rate)
 		}
 	}
+}
+func ChangePitch2(pitchValue float64, vm []*Voice) {
+	log.Println(pitchValue)
+
+	for _, o := range vm {
+		//o.PitchMode <- pitchValue
+		o.Oscillator.Retune(pitchValue)
+		//	o.Oscillator.Osc.Freq += pitchValue
+
+	}
+
 }

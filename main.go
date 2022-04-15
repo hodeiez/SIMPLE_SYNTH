@@ -31,14 +31,13 @@ func main() {
 
 	//**********************************************gui****************************************************************
 	msg := make(chan midi.MidiMsg)
-
-	go gui.Run(&controller)
+	test := make(chan float64, 1)
+	go gui.Run(&controller, test)
 
 	//thread for midi
 
 	go midi.RunMidi(msg)
 
-	// }()
 	//thread for audio
 	start := dsp.DspConf{BufferSize: bufferSize, VM: &vmanager}
 
@@ -46,9 +45,8 @@ func main() {
 
 	for {
 
-		generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
-		//	generator.ChangePitch(*controller.Pitch, vmanager.Voices) //TODO: change on stream
-		generator.RunPolly(vmanager, <-msg, controller)
+		go generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
+		go generator.RunPolly(vmanager, <-msg, controller, test, pitch)
 
 	}
 

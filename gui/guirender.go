@@ -19,7 +19,7 @@ import (
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
-func Render(w *app.Window, controller *generator.Controls) error {
+func Render(w *app.Window, controller *generator.Controls, test chan float64) error {
 	//the theme
 	th := material.NewTheme(gofont.Collection())
 
@@ -40,10 +40,11 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(30)}
 
-	slider := components.Slider(th, 120.0, 800.0, "pitch")
+	slider := components.Slider(th, 10.0, 80.0, "pitch")
 	oscPanel1 := components.NewOscPanel(selector, controller.SelectorFunc, slider)
-	// test <- slider.FloatWidget.Value
+	//
 	//render
+
 	for {
 
 		//close(test)
@@ -52,6 +53,15 @@ func Render(w *app.Window, controller *generator.Controls) error {
 		case system.DestroyEvent:
 			return e.Err
 		case system.FrameEvent:
+			//test <- float64(slider.FloatWidget.Value)
+			// select {
+			// case <-test:
+
+			// 	log.Println("go")
+
+			// default:
+
+			// }
 
 			components.SelectorCounter(oscPanel1.WaveSelector.ButtonUp.ClickWidget, oscPanel1.WaveSelector.ButtonDown.ClickWidget, oscPanel1.WaveType)
 
@@ -95,7 +105,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 				)
 
 			})
-			//TODO: refactor to component
+
 			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginOscPanels.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center), WeightSum: 20}.Layout(gtx,
@@ -118,10 +128,10 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*pitch.Pitch = float64(pitchSlide.FloatWidget.Value)
 
 }
-func Run(controller *generator.Controls) {
+func Run(controller *generator.Controls, test chan float64) {
 	w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
 
-	err := Render(w, controller)
+	err := Render(w, controller, test)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -66,10 +66,10 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg midi.MidiMsg, osc *Osc, actualFreq float64) Osc {
+func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 
-	//a := 440.0
-	a := actualFreq
+	a := 440.0
+	//a := actualFreq
 
 	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
 
@@ -98,6 +98,15 @@ func SelectWave(selector MyWaveType, voices []*Voice) {
 	}
 }
 func ChangePitch(pitchValue float64, voices []*Voice) {
+	for {
+		for _, o := range voices {
+			//o.PitchMode <- pitchValue
+			o.Oscillator.Retune(pitchValue)
+
+		}
+	}
+}
+func ChangePitchchan(pitchValue float64, voices []*Voice) {
 
 	for _, o := range voices {
 		//o.PitchMode <- pitchValue
