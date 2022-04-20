@@ -9,8 +9,8 @@ import (
 
 func AdsrImage(ops *op.Ops, sliders []MySlider) {
 	var path clip.Path
-	attackVal := float32(10) + sliders[0].FloatWidget.Value/2000000000  //2000000
-	decayVal := attackVal + (sliders[1].FloatWidget.Value / 2000000000) // 2000000
+	attackVal := float32(10) + sliders[0].FloatWidget.Value/20000000  //2000000
+	decayVal := attackVal + (sliders[1].FloatWidget.Value / 20000000) // 2000000
 	susamp := -20 - (sliders[2].FloatWidget.Value * 6000)
 	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20000000)
 
