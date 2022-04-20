@@ -86,7 +86,7 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 		vManager.Voices[foundKey.Index].Midi = midimsg
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-		//vManager.Voices[foundKey.Index].Quit <- true
+
 		vManager.Voices[foundKey.Index].RunADSR(&vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
 		//ChangePitch(*controller.Pitch, vManager.Voices)
 
@@ -104,8 +104,8 @@ func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls, 
 	// 	ChangePitch2(pitch, vManager.Voices)
 	// }
 
-	go VoiceOnNoteOn(vManager, midimsg, controller)
-	go VoiceOnNoteOff(vManager, midimsg, controller)
+	VoiceOnNoteOn(vManager, midimsg, controller)
+	VoiceOnNoteOff(vManager, midimsg, controller)
 
 	// select {
 	// case <-midimsg:
