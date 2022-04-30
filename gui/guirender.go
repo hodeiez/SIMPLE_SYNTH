@@ -19,7 +19,7 @@ import (
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
-func Render(w *app.Window, controller *generator.Controls, test chan float64) error {
+func Render(w *app.Window, controller *generator.Controls) error {
 	//the theme
 	th := material.NewTheme(gofont.Collection())
 
@@ -54,15 +54,6 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 		case system.DestroyEvent:
 			return e.Err
 		case system.FrameEvent:
-			// test <- float64(slider.FloatWidget.Value)
-			// select {
-			// case <-test:
-
-			// 	log.Println("go")
-
-			// default:
-
-			// }
 
 			components.SelectorCounter(oscPanel1.WaveSelector.ButtonUp.ClickWidget, oscPanel1.WaveSelector.ButtonDown.ClickWidget, oscPanel1.WaveType)
 
@@ -129,10 +120,10 @@ func bindControls(controller *generator.ADSRControl, sliders []components.MySlid
 	*pitch.Pitch = float64(pitchSlide.FloatWidget.Value)
 
 }
-func Run(controller *generator.Controls, test chan float64) {
+func Run(controller *generator.Controls) {
 	w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
 
-	err := Render(w, controller, test)
+	err := Render(w, controller)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,6 +1,8 @@
 package main
 
 import (
+	//	"log"
+
 	"hodei.naiz/simplesynth/gui"
 	"hodei.naiz/simplesynth/synth/dsp"
 	"hodei.naiz/simplesynth/synth/generator"
@@ -31,8 +33,8 @@ func main() {
 
 	//**********************************************gui****************************************************************
 	msg := make(chan midi.MidiMsg)
-	test := make(chan float64, 1)
-	go gui.Run(&controller, test)
+
+	go gui.Run(&controller)
 
 	//thread for midi
 
@@ -45,8 +47,8 @@ func main() {
 
 	for {
 
+		go generator.RunPolly(vmanager, <-msg, controller)
 		go generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
-		go generator.RunPolly(vmanager, <-msg, controller, test, pitch)
 
 	}
 

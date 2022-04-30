@@ -94,26 +94,10 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 }
 
-func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls, test chan float64, pitch float64) {
-
-	// select {
-	// case <-test:
-	// 	pitch = <-test
-	// 	ChangePitch2(pitch, vManager.Voices)
-	// default:
-	// 	ChangePitch2(pitch, vManager.Voices)
-	// }
+func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 
 	VoiceOnNoteOn(vManager, midimsg, controller)
 	VoiceOnNoteOff(vManager, midimsg, controller)
-
-	// select {
-	// case <-midimsg:
-	// 	go VoiceOnNoteOn(vManager, <-midimsg, controller)
-	// 	go VoiceOnNoteOff(vManager, <-midimsg, controller)
-	// 	log.Println(vManager.Voices)
-	// default:
-	// }
 
 }
 
@@ -138,15 +122,4 @@ func (voice *Voice) adsrAction(selector string, actionType string, rate float64)
 			voice.decreaseAmp(rate)
 		}
 	}
-}
-func ChangePitch2(pitchValue float64, vm []*Voice) {
-	//log.Println(pitchValue)
-
-	for _, o := range vm {
-		//o.PitchMode <- pitchValue
-		//o.Oscillator.Retune(pitchValue)
-		o.Oscillator.Osc.Freq = pitchValue
-
-	}
-
 }
