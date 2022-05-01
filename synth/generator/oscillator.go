@@ -66,9 +66,9 @@ func Oscillator(bufferSize int) Osc {
 
 }
 
-func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
+func ChangeFreq(midimsg midi.MidiMsg, osc *Osc, basePitch float64) Osc {
 
-	a := 440.0
+	a := 440.0 + basePitch
 	//a := actualFreq
 
 	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))

@@ -1,8 +1,6 @@
 package main
 
 import (
-	//	"log"
-
 	"hodei.naiz/simplesynth/gui"
 	"hodei.naiz/simplesynth/synth/dsp"
 	"hodei.naiz/simplesynth/synth/generator"
@@ -33,8 +31,8 @@ func main() {
 
 	//**********************************************gui****************************************************************
 	msg := make(chan midi.MidiMsg)
-
-	go gui.Run(&controller)
+	pitchChan := make(chan float64, 1)
+	go gui.Run(&controller, pitchChan)
 
 	//thread for midi
 
@@ -44,12 +42,31 @@ func main() {
 	start := dsp.DspConf{BufferSize: bufferSize, VM: &vmanager}
 
 	go dsp.Run(start)
-
+	//pitch:=0.0
+	//go chanBuffer(test, pitch)
+	go fx2(pitchChan, vmanager, pitch)
 	for {
-
-		go generator.RunPolly(vmanager, <-msg, controller)
+		go generator.RunPolly(vmanager, <-msg, controller, pitch)
 		go generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
+		//go fx(pitch, vmanager)
 
 	}
 
+}
+func fx2(pitchChan chan float64, vmanager generator.VoiceManager, pitch float64) {
+	//	for {
+	for {
+		select {
+		case <-pitchChan:
+
+			for _, o := range vmanager.Voices {
+				pitch = <-pitchChan
+				o.Oscillator.Osc.SetFreq(o.Oscillator.Osc.Freq + <-pitchChan)
+
+			}
+		default:
+
+		}
+	}
+	//	}
 }
