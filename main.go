@@ -42,19 +42,17 @@ func main() {
 	start := dsp.DspConf{BufferSize: bufferSize, VM: &vmanager}
 
 	go dsp.Run(start)
-	//pitch:=0.0
-	//go chanBuffer(test, pitch)
-	go fx2(pitchChan, vmanager, pitch)
+
+	go fx(pitchChan, vmanager, pitch)
 	for {
 		go generator.RunPolly(vmanager, <-msg, controller, pitch)
 		go generator.SelectWave(*controller.SelectorFunc, vmanager.Voices)
-		//go fx(pitch, vmanager)
 
 	}
 
 }
-func fx2(pitchChan chan float64, vmanager generator.VoiceManager, pitch float64) {
-	//	for {
+func fx(pitchChan chan float64, vmanager generator.VoiceManager, pitch float64) {
+
 	for {
 		select {
 		case <-pitchChan:
@@ -68,5 +66,5 @@ func fx2(pitchChan chan float64, vmanager generator.VoiceManager, pitch float64)
 
 		}
 	}
-	//	}
+
 }

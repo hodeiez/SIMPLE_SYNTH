@@ -1,5 +1,11 @@
 package generator
 
+import (
+	//"log"
+	//"log"
+	"time"
+)
+
 type ADSR struct {
 	AttackTime  float64
 	DecayTime   float64
@@ -15,31 +21,34 @@ func (voice *Voice) RunADSR(parameter *float64, controller Controls, controlRate
 	rTime := *controller.ADSRcontrol.ReleaseTime
 	if voice.Midi.On {
 		*parameter = 0.0 //min value
-	loop:
-		for {
+		ticker := time.NewTicker(1 * time.Millisecond)
+		//quit := make(chan struct{})
+		go func() {
+			for {
+				select {
+				case <-ticker.C:
+					//	log.Println(aTime)
+					if aTime >= voice.TimeControl { // && voice.TimeControl < aTime {
+						if aTime == 0 {
+							//log.Println("here")
+							*parameter = 0.01 //max value
+						} else if aTime > 0.0 && *parameter < 0.01 {
+							go voice.adsrAction("INCREASE", actionType, 1.0/(aTime)) //1000
 
-			select {
-			case <-voice.Quit:
-				break loop
-			default:
-
-				if aTime > voice.TimeControl && voice.TimeControl < aTime+dTime {
-					if aTime == 1 {
-
-						*parameter = 0.01 //max value
-					} else if aTime != 1 {
-						go voice.adsrAction("INCREASE", actionType, 1/(aTime)) //1000
+						}
 					}
-				} else if aTime+dTime > voice.TimeControl && sAmp < *controlRate {
-					go voice.adsrAction("DECREASE", actionType, 1/(dTime)) //1000
+					if aTime < voice.TimeControl && sAmp <= *controlRate {
+						go voice.adsrAction("DECREASE", actionType, 1.0/(dTime)) //1000
 
+					}
+					//	log.Println(aTime, voice.TimeControl, dTime, *parameter)
+					voice.TimeControl += 1 //0.1
+				case <-voice.Quit:
+					ticker.Stop()
+					return
 				}
-
-				voice.TimeControl += 0.1 //0.1
-				continue
 			}
-
-		}
+		}()
 
 	} else if !voice.Midi.On {
 

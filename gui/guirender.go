@@ -28,7 +28,7 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 	//init
 	selector := components.CreateSelector(th)
 	//A->100000000.0 //D->100000000.0
-	sliders := []components.MySlider{components.Slider(th, 1, 1000000000.0, "A"), components.Slider(th, 1000000, 1000000000.0 /* 100000000000.0 */, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 500000000.0, "R")}
+	sliders := []components.MySlider{components.Slider(th, 0, 10000.0, "A"), components.Slider(th, 0.0, 10000.0 /* 100000000000.0 */, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 500000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
 	marginCenter := layout.Inset{Top: unit.Dp(100),
@@ -57,12 +57,6 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 			if slider.FloatWidget.Changed() {
 				test <- float64(slider.FloatWidget.Value)
 
-				// select {
-				// case test <- float64(slider.FloatWidget.Value):
-				// 	log.Println("sending")
-				// default:
-				// 	log.Println("is default")
-				// }
 			}
 			components.SelectorCounter(oscPanel1.WaveSelector.ButtonUp.ClickWidget, oscPanel1.WaveSelector.ButtonDown.ClickWidget, oscPanel1.WaveType)
 
