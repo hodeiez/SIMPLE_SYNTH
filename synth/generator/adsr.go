@@ -22,7 +22,7 @@ func (voice *Voice) RunADSR(parameter *float64, controller Controls, controlRate
 	if voice.Midi.On {
 		*parameter = 0.0 //min value
 		ticker := time.NewTicker(1 * time.Millisecond)
-
+		//TODO: abstract timer to a function
 		go func() {
 			for {
 				select {
@@ -33,12 +33,12 @@ func (voice *Voice) RunADSR(parameter *float64, controller Controls, controlRate
 
 							*parameter = 0.01 //max value
 						} else if aTime > 0.0 && *parameter < 0.01 {
-							go voice.adsrAction("INCREASE", actionType, 0.1/(aTime))
+							go voice.adsrAction("INCREASE", actionType, 0.01/(aTime))
 
 						}
 					}
 					if aTime < voice.TimeControl && sAmp <= *controlRate {
-						go voice.adsrAction("DECREASE", actionType, 0.1/(dTime))
+						go voice.adsrAction("DECREASE", actionType, 0.01/(dTime))
 
 					}
 
