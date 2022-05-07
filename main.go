@@ -27,7 +27,7 @@ func main() {
 	adsrControl := generator.ADSRControl{AttackTime: &attackCtrl, DecayTime: &decayCtrl, SustainAmp: &susCtrl, ReleaseTime: &relCtrl}
 	controller := generator.Controls{SelectorFunc2: &count2, SelectorFunc: &count, ShowAmp: &amplitudeVal, ADSRcontrol: &adsrControl, Pitch: &pitch}
 
-	vmanager := generator.PolyInit(bufferSize, 3, controller) //4 is max polyphony
+	vmanager := generator.PolyInit(bufferSize, 6, controller)
 
 	//**********************************************gui****************************************************************
 	msg := make(chan midi.MidiMsg)
