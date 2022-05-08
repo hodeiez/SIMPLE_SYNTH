@@ -17,6 +17,7 @@ type Osc struct {
 	gainControl float64
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
+	BaseFreq    float64
 }
 
 type MyWaveType int64
@@ -62,25 +63,20 @@ func Oscillator(bufferSize int) Osc {
 	signal.Notify(sig, os.Interrupt, os.Kill)
 
 	log.Println("oscillator running")
-	return Osc{0.0, osc, buf}
+	return Osc{0.0, osc, buf, 440.0}
 
 }
 
-func ChangeFreq(midimsg midi.MidiMsg, osc *Osc, basePitch float64) Osc {
+func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 
-	a := 440.0 + basePitch
-	//a := actualFreq
-
-	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
+	NoteToPitch := (osc.BaseFreq / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
 
 	if midimsg.On {
 		osc.Osc.SetFreq(NoteToPitch)
 	}
 	return *osc
 }
-func (osc *Osc) Retune(pitchRate float64) {
-	osc.Osc.Freq += pitchRate
-}
+
 func SelectWave(selector MyWaveType, voices []*Voice) {
 	for _, o := range voices {
 		switch selector {
@@ -96,22 +92,4 @@ func SelectWave(selector MyWaveType, voices []*Voice) {
 		}
 
 	}
-}
-func ChangePitch(pitchValue float64, voices []*Voice) {
-	for {
-		for _, o := range voices {
-			//o.PitchMode <- pitchValue
-			o.Oscillator.Retune(pitchValue)
-
-		}
-	}
-}
-func ChangePitchchan(pitchValue float64, voices []*Voice) {
-
-	for _, o := range voices {
-		//o.PitchMode <- pitchValue
-		o.Oscillator.Retune(pitchValue)
-
-	}
-
 }

@@ -65,7 +65,7 @@ func VoicesHasKey(midimsg midi.MidiMsg, vManager VoiceManager) FoundKey {
 	}
 	return FoundKey{-1, -1}
 }
-func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls, basePitch float64) {
+func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 
 	foundKey := VoicesHasKey(midimsg, vManager)
 	if midimsg.On && foundKey.Index == -1 {
@@ -74,7 +74,7 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 
 			vManager.Voices[voiceIndex].Midi = midimsg
 
-			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator, basePitch)
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
 			vManager.Voices[voiceIndex].RunADSR(&vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 
 		}
@@ -93,9 +93,9 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 }
 
-func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls, basePitch float64) {
+func RunPolly(vManager VoiceManager, midimsg midi.MidiMsg, controller Controls) {
 
-	VoiceOnNoteOn(vManager, midimsg, controller, basePitch)
+	VoiceOnNoteOn(vManager, midimsg, controller)
 	VoiceOnNoteOff(vManager, midimsg, controller)
 
 }

@@ -40,7 +40,8 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(30)}
 
-	slider := components.Slider(th, -60.0, 0.0, "pitch")
+	slider := components.Slider(th, 240.00, 640.00, "pitch")
+	slider.FloatWidget.Value = 440.00
 	oscPanel1 := components.NewOscPanel(selector, controller.SelectorFunc, slider)
 	//
 	//render

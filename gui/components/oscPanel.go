@@ -4,6 +4,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
+	"hodei.naiz/simplesynth/helpers"
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
@@ -40,7 +41,7 @@ func (oscPanel OscPanel) Render(th *material.Theme) layout.FlexChild {
 					//return label.Layout(gtx)
 				}),
 				layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
-					label := material.Label(th, unit.Dp(10), "VOLUME")
+					label := material.Label(th, unit.Dp(10), helpers.Float32ToString(oscPanel.PitchSlider.FloatWidget.Value))
 					label.TextSize = unit.Dp(20)
 					return label.Layout(gtx)
 				}),
