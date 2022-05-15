@@ -12,6 +12,7 @@ A simple synth made using golang
 <li>A simple gui running where wave type selector is functional</li>
 <li>A simple ADSR working controlled via GUI</li>
 <li>Basic configurable polyphony </li>
+<li>Pitch shift </li>
 </ul>
 <image src="synthPic.png"/>
 <h5>actual project status (polyphonic, has a wave selector(sine,triangle, saw, square),ADSR envelope, pitch shift)</h5>
