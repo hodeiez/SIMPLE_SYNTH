@@ -14,7 +14,7 @@ A simple synth made using golang
 <li>Basic configurable polyphony </li>
 </ul>
 <image src="synthPic.png"/>
-<h5>actual project status (a wave selector, and an ADSR envelope)</h5>
+<h5>actual project status (polyphonic, has a wave selector(sine,triangle, saw, square),ADSR envelope, pitch shift)</h5>
 <h1>About</h1>
 <p>Before running: get dependencies, and connect a midi controller</p>
 <p>Dependencies needed in your OS apart from "go get $whatever":</p>
