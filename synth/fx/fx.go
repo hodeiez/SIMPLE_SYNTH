@@ -1,8 +1,6 @@
 package fx
 
 import (
-	"log"
-
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
@@ -20,21 +18,17 @@ func (fx *FX) Run(vmanager generator.VoiceManager, controllerPitch float64) {
 	for {
 		select {
 		case <-fx.PitchChan:
-			log.Println(<-fx.PitchChan)
 
-			for _, o := range vmanager.Voices {
-
-				o.Oscillator.Osc.SetFreq(o.Oscillator.Osc.Freq + (<-fx.PitchChan - o.Oscillator.BaseFreq))
-
-			}
-			for _, o := range vmanager.Voices {
-
-				o.Oscillator.BaseFreq = <-fx.PitchChan
-			}
 			pitch = <-fx.PitchChan
-			log.Println(<-fx.PitchChan)
+			for _, o := range vmanager.Voices {
+
+				o.Oscillator.Osc.SetFreq(o.Oscillator.Osc.Freq + (pitch - o.Oscillator.BaseFreq))
+			}
 		default:
-			log.Println("IN DEFAULT", pitch)
+			for _, o := range vmanager.Voices {
+
+				o.Oscillator.BaseFreq = pitch
+			}
 
 		}
 	}
