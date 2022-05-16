@@ -72,7 +72,7 @@ func ShowSelector(th *material.Theme, gtx layout.Context, raw *Selector, texto *
 func setButtonStyle(button *material.ButtonStyle) {
 	button.TextSize = unit.Dp(10)
 
-	button.Inset = layout.Inset{unit.Dp(5), unit.Dp(5), unit.Dp(5), unit.Dp(5)}
+	button.Inset = layout.Inset{unit.Dp(10), unit.Dp(10), unit.Dp(10), unit.Dp(10)}
 
 	button.Background = NewMyStyles().colorAccent
 	button.CornerRadius = unit.Dp(10)

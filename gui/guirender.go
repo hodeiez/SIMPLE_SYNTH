@@ -48,7 +48,6 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 
 	for {
 
-		//close(test)
 		e := <-w.Events()
 		switch e := e.(type) {
 
@@ -84,7 +83,7 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 						func(gtx layout.Context) layout.Dimensions {
 
 							d := image.Point{Y: 100, X: 100}
-							//return strokeTriangle(&ops, d, gtx)
+
 							return layout.Dimensions{Size: d}
 						}),
 				)
@@ -104,7 +103,7 @@ func Render(w *app.Window, controller *generator.Controls, test chan float64) er
 
 			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginOscPanels.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center), WeightSum: 20}.Layout(gtx,
+					return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceBetween, WeightSum: 20}.Layout(gtx,
 						oscPanel1.Render(th),
 					)
 

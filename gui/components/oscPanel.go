@@ -17,32 +17,36 @@ type OscPanel struct {
 
 func NewOscPanel(selector Selector, waveType *generator.MyWaveType, slider MySlider) OscPanel {
 	marginOscPanel := layout.Inset{Top: unit.Dp(0),
-		Bottom: unit.Dp(20),
+		Bottom: unit.Dp(0),
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(0)}
 	return OscPanel{Margin: &marginOscPanel, WaveSelector: &selector, WaveType: waveType, PitchSlider: slider}
 }
 func (oscPanel OscPanel) Render(th *material.Theme) layout.FlexChild {
-	return layout.Flexed(2, func(gtx layout.Context) layout.Dimensions {
+	//selectorSize := layout.Dimensions{Size: image.Point{1, 2}}
+
+	return layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 		return oscPanel.Margin.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255), WeightSum: 20}.Layout(gtx,
+			return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceSides, WeightSum: 10}.Layout(gtx,
 
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					theSelector := ShowSelector(th, gtx, oscPanel.WaveSelector, oscPanel.WaveType)
-					theSelector.Size.X = 200
-					return theSelector
+					selector := oscPanel.WaveSelector
+					return ShowSelector(th, gtx, selector, oscPanel.WaveType)
 
 				}),
-				layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
+				layout.Flexed(2, func(gtx layout.Context) layout.Dimensions {
 					label := material.Label(th, unit.Dp(10), oscPanel.PitchSlider.StyledLabel.Text)
 					label.TextSize = unit.Dp(20)
+					slider := oscPanel.PitchSlider
+					slider.FloatWidget.Axis = layout.Horizontal
 
-					return oscPanel.PitchSlider.StyledSlide.Layout(gtx)
-					//return label.Layout(gtx)
+					return slider.StyledSlide.Layout(gtx)
 				}),
-				layout.Flexed(5, func(gtx layout.Context) layout.Dimensions {
+
+				layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+
 					label := material.Label(th, unit.Dp(10), helpers.Float32ToString(oscPanel.PitchSlider.FloatWidget.Value))
-					label.TextSize = unit.Dp(20)
+					label.TextSize = unit.Dp(13)
 					return label.Layout(gtx)
 				}),
 			)
