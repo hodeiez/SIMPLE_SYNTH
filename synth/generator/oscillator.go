@@ -87,10 +87,10 @@ func SelectWave(selector MyWaveType, voices []*Voice) {
 			o.Oscillator.Osc.Shape = generator.WaveType(generator.WaveSaw)
 			o.Oscillator2.Osc.Shape = generator.WaveType(generator.WaveTriangle)
 		case 2:
-			o.Oscillator2.Osc.Shape = generator.WaveType(generator.WaveSqr)
+			o.Oscillator.Osc.Shape = generator.WaveType(generator.WaveSqr)
 			o.Oscillator2.Osc.Shape = generator.WaveType(generator.WaveSaw)
 		case 3:
-			o.Oscillator2.Osc.Shape = generator.WaveType(generator.WaveSine)
+			o.Oscillator.Osc.Shape = generator.WaveType(generator.WaveSine)
 			o.Oscillator.Osc.Shape = generator.WaveType(generator.WaveSqr)
 
 		}

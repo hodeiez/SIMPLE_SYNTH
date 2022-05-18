@@ -78,7 +78,9 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 			vManager.Voices[voiceIndex].Midi = midimsg
 
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
+			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator2)
 			vManager.Voices[voiceIndex].RunADSR(&vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
+			vManager.Voices[voiceIndex].RunADSR(&vManager.Voices[voiceIndex].Oscillator2.Osc.Amplitude, controller, &vManager.Voices[voiceIndex].Oscillator2.Osc.Amplitude, "AMP")
 
 		}
 	}
@@ -91,6 +93,7 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 		vManager.Voices[foundKey.Index].Midi.Key = -1
 
 		vManager.Voices[foundKey.Index].RunADSR(&vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
+		vManager.Voices[foundKey.Index].RunADSR(&vManager.Voices[foundKey.Index].Oscillator2.Osc.Amplitude, controller, &vManager.Voices[foundKey.Index].Oscillator2.Osc.Amplitude, "AMP")
 
 	}
 

@@ -72,7 +72,7 @@ func f64ToF32Mixing(dst []float32, src DspConf) {
 	for i := range src.VM.Voices[0].Oscillator.Buf.Data {
 		sum := 0.0
 		for _, el := range src.VM.Voices {
-			sum += el.Oscillator.Buf.Data[i]
+			sum += el.Oscillator.Buf.Data[i] + el.Oscillator2.Buf.Data[i]
 			dst[i] = float32(sum)
 
 		}
