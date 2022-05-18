@@ -1,1 +1,2 @@
-go build -ldflags -H=windowsgui //build without console
+//build without console
+go build -ldflags -H=windowsgui 

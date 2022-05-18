@@ -17,6 +17,7 @@ type Osc struct {
 	gainControl float64
 	Osc         *generator.Osc
 	Buf         *audio.FloatBuffer
+	BaseFreq    float64
 }
 
 type MyWaveType int64
@@ -50,7 +51,8 @@ func Oscillator(bufferSize int) Osc {
 
 	buf := &audio.FloatBuffer{
 		Data:   make([]float64, bufferSize),
-		Format: audio.FormatMono44100,
+		Format: audio.FormatStereo44100,
+		//Format: audio.FormatMono22500,
 	}
 	//***************************
 	currentNote := 440.0
@@ -61,15 +63,13 @@ func Oscillator(bufferSize int) Osc {
 	signal.Notify(sig, os.Interrupt, os.Kill)
 
 	log.Println("oscillator running")
-	return Osc{0.0, osc, buf}
+	return Osc{0.0, osc, buf, 440.0}
 
 }
 
 func ChangeFreq(midimsg midi.MidiMsg, osc *Osc) Osc {
 
-	a := 440.0
-
-	NoteToPitch := (a / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
+	NoteToPitch := (osc.BaseFreq / 32) * (math.Pow(2, ((float64(midimsg.Key) - 9) / 12)))
 
 	if midimsg.On {
 		osc.Osc.SetFreq(NoteToPitch)

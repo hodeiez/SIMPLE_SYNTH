@@ -3,11 +3,10 @@ package gui
 import (
 	"image"
 	"image/color"
+	"log"
+	"os"
 
 	"gioui.org/app"
-	"gioui.org/f32"
-	"gioui.org/op/clip"
-	"gioui.org/op/paint"
 
 	"gioui.org/font/gofont"
 	"gioui.org/io/system"
@@ -20,7 +19,7 @@ import (
 	"hodei.naiz/simplesynth/synth/generator"
 )
 
-func Render(w *app.Window, controller *generator.Controls) error {
+func Render(w *app.Window, controller *generator.Controls, test chan float64) error {
 	//the theme
 	th := material.NewTheme(gofont.Collection())
 
@@ -28,28 +27,41 @@ func Render(w *app.Window, controller *generator.Controls) error {
 	var ops op.Ops
 	//init
 	selector := components.CreateSelector(th)
-	selector2 := components.CreateSelector(th)
-	sliders := []components.MySlider{components.Slider(th, 1, 100000000.0, "A"), components.Slider(th, 1, 100000000.0, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 100000000.0, "R")}
+	//A->100000000.0 //D->100000000.0
+	sliders := []components.MySlider{components.Slider(th, 0, 1000.0, "A"), components.Slider(th, 0.0, 1000.0, "D"), components.Slider(th, 0.0, 0.0099, "S"), components.Slider(th, 1, 500000000.0, "R")}
 	adsrPanel := components.SliderPanel{Sliders: sliders, PanelColor: color.NRGBA{250, 250, 50, 255}}
 
 	marginCenter := layout.Inset{Top: unit.Dp(100),
 		Bottom: unit.Dp(50),
 		Right:  unit.Dp(0),
 		Left:   unit.Dp(0)}
+	marginOscPanels := layout.Inset{Top: unit.Dp(0),
+		Bottom: unit.Dp(0),
+		Right:  unit.Dp(0),
+		Left:   unit.Dp(30)}
 
+	slider := components.Slider(th, 240.00, 640.00, "pitch")
+	slider.FloatWidget.Value = 440.00
+	oscPanel1 := components.NewOscPanel(selector, controller.SelectorFunc, slider)
+	//
 	//render
+
 	for {
 
 		e := <-w.Events()
 		switch e := e.(type) {
+
 		case system.DestroyEvent:
 			return e.Err
 		case system.FrameEvent:
+			if slider.FloatWidget.Changed() {
+				test <- float64(slider.FloatWidget.Value)
 
-			components.SelectorCounter(selector.ButtonUp.ClickWidget, selector.ButtonDown.ClickWidget, controller.SelectorFunc)
-			components.SelectorCounter(selector2.ButtonUp.ClickWidget, selector2.ButtonDown.ClickWidget, controller.SelectorFunc2)
+			}
+			components.SelectorCounter(oscPanel1.WaveSelector.ButtonUp.ClickWidget, oscPanel1.WaveSelector.ButtonDown.ClickWidget, oscPanel1.WaveType)
 
-			bindControls(controller.ADSRcontrol, sliders)
+			bindControls(controller.ADSRcontrol, sliders, controller, slider)
+
 			gtx := layout.NewContext(&ops, e)
 			layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return marginCenter.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -57,7 +69,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							adsrImage(&ops, sliders)
+							components.AdsrImage(&ops, sliders)
 							return components.ShowADSRPanel(th, gtx, adsrPanel)
 
 						}),
@@ -71,7 +83,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 						func(gtx layout.Context) layout.Dimensions {
 
 							d := image.Point{Y: 100, X: 100}
-							//return strokeTriangle(&ops, d, gtx)
+
 							return layout.Dimensions{Size: d}
 						}),
 				)
@@ -80,7 +92,7 @@ func Render(w *app.Window, controller *generator.Controls) error {
 			layout.SW.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return material.Label(th, unit.Dp(20), "THE SIMPLE SYNTH").Layout(gtx)
+						return material.Label(th, unit.Dp(20), "SIMPLE SYNTH").Layout(gtx)
 					}),
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return material.Label(th, unit.Dp(10), "by hodei").Layout(gtx)
@@ -88,73 +100,35 @@ func Render(w *app.Window, controller *generator.Controls) error {
 				)
 
 			})
-			/* layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
-			}) */
+
 			layout.W.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return marginOscPanels.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceBetween, WeightSum: 20}.Layout(gtx,
+						oscPanel1.Render(th),
+					)
 
-				return layout.Flex{Axis: layout.Vertical, Spacing: layout.Spacing(layout.Center)}.Layout(gtx,
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return components.ShowSelector(th, gtx, &selector, controller.SelectorFunc)
-							}),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return material.Label(th, unit.Dp(10), "Pitch").Layout(gtx)
-							}),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return material.Label(th, unit.Dp(10), "VOLUME?").Layout(gtx)
-							}),
-						)
-					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return layout.Flex{Axis: layout.Horizontal, Spacing: layout.Spacing(255)}.Layout(gtx,
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return components.ShowSelector(th, gtx, &selector2, controller.SelectorFunc2)
-							}),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return material.Label(th, unit.Dp(10), "Pitch").Layout(gtx)
-							}),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return material.Label(th, unit.Dp(10), "VOLUME?").Layout(gtx)
-							}),
-						)
-					}),
-				)
-
+				})
 			})
-
 			e.Frame(gtx.Ops)
 
 		}
+
 	}
 }
-func bindControls(controller *generator.ADSRControl, sliders []components.MySlider) {
+func bindControls(controller *generator.ADSRControl, sliders []components.MySlider, pitch *generator.Controls, pitchSlide components.MySlider) {
 	*controller.AttackTime = float64(sliders[0].FloatWidget.Value)
 	*controller.DecayTime = float64(sliders[1].FloatWidget.Value)
 	*controller.SustainAmp = float64(sliders[2].FloatWidget.Value)
 	*controller.ReleaseTime = float64(sliders[3].FloatWidget.Value)
+	*pitch.Pitch = float64(pitchSlide.FloatWidget.Value)
+
 }
+func Run(controller *generator.Controls, test chan float64) {
+	w := app.NewWindow(app.Size(unit.Dp(800), unit.Dp(600)), app.Title("Symple synth"))
 
-//TODO: move to components and fix values (add beziers?)
-func adsrImage(ops *op.Ops, sliders []components.MySlider) {
-	var path clip.Path
-	attackVal := float32(10) + sliders[0].FloatWidget.Value/2000000
-	decayVal := attackVal + (sliders[1].FloatWidget.Value / 2000000)
-	susamp := -20 - (sliders[2].FloatWidget.Value * 6000)
-	releaseVal := attackVal + decayVal + (sliders[3].FloatWidget.Value / 20000000)
-
-	path.Begin(ops)
-	path.MoveTo(f32.Pt(0, -20))
-	path.LineTo(f32.Pt(attackVal, -80))
-	path.LineTo(f32.Pt(decayVal, susamp))
-	path.LineTo(f32.Pt(attackVal+decayVal, susamp))
-	path.LineTo(f32.Pt(releaseVal, -20))
-	color := color.NRGBA{R: 255, A: 255, B: 100}
-	paint.FillShape(ops, color,
-		clip.Stroke{
-			Path:  path.End(),
-			Width: 8,
-		}.Op())
-
+	err := Render(w, controller, test)
+	if err != nil {
+		log.Fatal(err)
+	}
+	os.Exit(0)
 }

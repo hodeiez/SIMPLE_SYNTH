@@ -33,8 +33,8 @@ func setupVoice(bufferSize int, controller Controls) *Voice {
 	osc2.Osc.Amplitude = 0.0
 	Midi := midi.MidiMsg{Key: -1, On: false}
 	timeControl := 0.0
-
-	quit := make(chan bool)
+	quit := make(chan bool, 1)
+	//
 
 	return &Voice{Oscillator: &osc, Oscillator2: &osc2, Midi: Midi, TimeControl: timeControl, ADSR: &adsr, Quit: quit}
 }
@@ -43,7 +43,6 @@ func PolyInit(bufferSize int, amountOfVoices int, controller Controls) VoiceMana
 	i := 0
 	for i < amountOfVoices {
 		voices = append(voices, setupVoice(bufferSize, controller))
-
 		i++
 	}
 	return VoiceManager{Voices: voices}
@@ -75,13 +74,12 @@ func VoiceOnNoteOn(vManager VoiceManager, midimsg midi.MidiMsg, controller Contr
 	if midimsg.On && foundKey.Index == -1 {
 		voiceIndex := vManager.FindFreeVoice()
 		if voiceIndex != -1 {
+
 			vManager.Voices[voiceIndex].Midi = midimsg
 
-			vManager.Voices[voiceIndex].Quit = make(chan bool)
-			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
 			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator)
-			go vManager.Voices[voiceIndex].RunADSR(controller, &vManager.Voices[voiceIndex].Oscillator2.Osc.Amplitude, "AMP")
-			ChangeFreq(vManager.Voices[voiceIndex].Midi, vManager.Voices[voiceIndex].Oscillator2)
+			vManager.Voices[voiceIndex].RunADSR(&vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, controller, &vManager.Voices[voiceIndex].Oscillator.Osc.Amplitude, "AMP")
+
 		}
 	}
 }
@@ -91,8 +89,9 @@ func VoiceOnNoteOff(vManager VoiceManager, midimsg midi.MidiMsg, controller Cont
 
 		vManager.Voices[foundKey.Index].Midi = midimsg
 		vManager.Voices[foundKey.Index].Midi.Key = -1
-		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
-		go vManager.Voices[foundKey.Index].RunADSR(controller, &vManager.Voices[foundKey.Index].Oscillator2.Osc.Amplitude, "AMP")
+
+		vManager.Voices[foundKey.Index].RunADSR(&vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, controller, &vManager.Voices[foundKey.Index].Oscillator.Osc.Amplitude, "AMP")
+
 	}
 
 }

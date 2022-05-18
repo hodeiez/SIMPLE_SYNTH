@@ -1,9 +1,9 @@
 package generator
 
 import (
-//"log"
-// "log"
-// "time"
+	//"log"
+	//"log"
+	"time"
 )
 
 type ADSR struct {
@@ -13,53 +13,67 @@ type ADSR struct {
 	ReleaseTime float64
 	ControlAmp  float64
 }
+type adsrRunner func(*Voice, *float64, Controls, *float64, string)
 
-//TODO: review logic and values
-func (voice *Voice) RunADSR(controller Controls, controlRate *float64, actionType string) {
-	aTime := *controller.ADSRcontrol.AttackTime
-	dTime := *controller.ADSRcontrol.DecayTime
-	sAmp := *controller.ADSRcontrol.SustainAmp
-	rTime := *controller.ADSRcontrol.ReleaseTime
-	if voice.Midi.On {
-		voice.Oscillator.Osc.Amplitude = 0.0
-		voice.Oscillator2.Osc.Amplitude = 0.0
-	loop:
-		for {
+//TODO: fix a struct for params
+func midiON(voice *Voice, parameter *float64, controller Controls, controlRate *float64, actionType string) {
 
-			select {
-			case <-voice.Quit:
+	if *controller.ADSRcontrol.AttackTime >= voice.TimeControl {
+		if *controller.ADSRcontrol.AttackTime == 0 {
 
-				break loop
-			default:
+			*parameter = 0.01 //max value
+		} else if *controller.ADSRcontrol.AttackTime > 0.0 && *parameter < 0.01 {
+			go voice.adsrAction("INCREASE", actionType, 0.01/(*controller.ADSRcontrol.AttackTime))
 
-				if aTime > voice.TimeControl && voice.TimeControl < aTime+dTime {
-					if aTime == 1 {
-						voice.Oscillator.Osc.Amplitude = 0.01
-						voice.Oscillator2.Osc.Amplitude = 0.01
-					} else if aTime != 1 {
-						voice.adsrAction("INCREASE", actionType, 1/(aTime*1000))
-					}
-				} else if aTime+dTime > voice.TimeControl && sAmp < *controlRate {
-					voice.adsrAction("DECREASE", actionType, 1/(dTime*1000))
-
-				}
-
-				voice.TimeControl += 0.1
-				continue
-			}
-
-		}
-	} else if !voice.Midi.On {
-		voice.Quit <- true
-		zero := 0.0
-		for {
-			if *controlRate <= zero {
-				voice.TimeControl = 0.0
-				break
-			}
-			voice.adsrAction("DECREASE", actionType, 1/(rTime*100))
-			voice.TimeControl += 0.1
 		}
 	}
+	if *controller.ADSRcontrol.AttackTime < voice.TimeControl && *controller.ADSRcontrol.SustainAmp <= *controlRate {
+		go voice.adsrAction("DECREASE", actionType, 0.01/(*controller.ADSRcontrol.DecayTime))
 
+	}
+
+	voice.TimeControl += 1
+}
+func ticker(runner adsrRunner, voice *Voice, parameter *float64, controller Controls, controlRate *float64, actionType string) {
+	ticker := time.NewTicker(1 * time.Millisecond)
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				runner(voice, parameter, controller, controlRate, actionType)
+			case <-voice.Quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
+}
+func (voice *Voice) RunADSR(parameter *float64, controller Controls, controlRate *float64, actionType string) {
+
+	rTime := *controller.ADSRcontrol.ReleaseTime
+	if voice.Midi.On {
+		*parameter = 0.0 //min value
+		ticker(midiON, voice, parameter, controller, controlRate, actionType)
+
+	} else if !voice.Midi.On {
+
+		voice.Quit <- true
+		zero := 0.0 //min value
+
+	loop2:
+		for {
+			if *controlRate <= zero {
+				*parameter = zero
+				voice.TimeControl = zero
+
+				break loop2
+			} else if voice.TimeControl < rTime && voice.TimeControl > zero {
+				go voice.adsrAction("DECREASE", actionType, 1/(rTime))
+			}
+			voice.TimeControl += 0.1 //0.1
+
+		}
+	}
 }
